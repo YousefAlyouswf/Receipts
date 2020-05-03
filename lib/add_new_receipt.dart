@@ -1,0 +1,199 @@
+import 'dart:io';
+import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:image_picker/image_picker.dart';
+import 'database/db_helper.dart';
+
+class AddNewReceipt extends StatefulWidget {
+  @override
+  _AddNewReceiptState createState() => _AddNewReceiptState();
+}
+
+class _AddNewReceiptState extends State<AddNewReceipt> {
+  File imageStored;
+  TextEditingController controllerName = TextEditingController();
+  TextEditingController controllerPrice = TextEditingController();
+  _takePicture() async {
+    final imageFile = await ImagePicker.pickImage(
+      source: ImageSource.camera,
+      maxWidth: 1200,
+      preferredCameraDevice: CameraDevice.rear,
+    );
+    setState(() {
+      imageStored = imageFile;
+    });
+  }
+
+  _takeFromGalary() async {
+    final imageFile = await ImagePicker.pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 1200,
+    );
+    setState(() {
+      imageStored = imageFile;
+    });
+  }
+
+  Future<String> getDate() async {
+    var now = new DateTime.now();
+    String dateReceipt = '${now.day}/${now.month}/${now.year}';
+    return dateReceipt;
+  }
+
+  bool visiable = false;
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("أدخل الفاتورة"),
+        centerTitle: true,
+      ),
+      body: Container(
+        width: double.infinity,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            Container(
+              width: double.infinity,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: <Widget>[
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      IconButton(
+                        onPressed: _takePicture,
+                        icon: Icon(Icons.camera),
+                        color: Colors.blue,
+                      ),
+                      SizedBox(
+                        width: 10,
+                      ),
+                      IconButton(
+                        onPressed: _takeFromGalary,
+                        icon: Icon(Icons.image),
+                        color: Colors.blue,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: Container(
+                child: imageStored != null
+                    ? SingleChildScrollView(
+                        child: Column(
+                          children: <Widget>[
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Container(
+                                height: MediaQuery.of(context).size.height / 4,
+                                width: MediaQuery.of(context).size.width / 3,
+                                child: Image.file(
+                                  imageStored,
+                                  fit: BoxFit.fill,
+                                  width: double.infinity,
+                                ),
+                              ),
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Padding(
+                                  padding: const EdgeInsets.all(16.0),
+                                  child: Container(
+                                    width:
+                                        MediaQuery.of(context).size.width / 3,
+                                    child: TextField(
+                                      controller: controllerPrice,
+                                      keyboardType: TextInputType.number,
+                                      textDirection: TextDirection.rtl,
+                                      decoration: InputDecoration(
+                                        labelText: 'ر.س',
+                                        border: OutlineInputBorder(),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(16.0),
+                                  child: Container(
+                                    width:
+                                        MediaQuery.of(context).size.width / 3,
+                                    child: TextField(
+                                      controller: controllerName,
+                                      autofocus: true,
+                                      keyboardType: TextInputType.text,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w300,
+                                      ),
+                                      textDirection: TextDirection.rtl,
+                                      decoration: InputDecoration(
+                                          labelText: 'المتجر',
+                                          border: OutlineInputBorder()),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            FlatButton(
+                              onPressed: () {
+                                if (controllerName.text.isEmpty) {
+                                  Fluttertoast.showToast(
+                                      msg: "أسم المتجر",
+                                      toastLength: Toast.LENGTH_SHORT,
+                                      gravity: ToastGravity.CENTER,
+                                      timeInSecForIosWeb: 1,
+                                      backgroundColor: Colors.red,
+                                      textColor: Colors.white,
+                                      fontSize: 16.0);
+                                } else if (controllerPrice.text.isEmpty) {
+                                  Fluttertoast.showToast(
+                                      msg: "إجمالي الفاتورة",
+                                      toastLength: Toast.LENGTH_SHORT,
+                                      gravity: ToastGravity.CENTER,
+                                      timeInSecForIosWeb: 1,
+                                      backgroundColor: Colors.red,
+                                      textColor: Colors.white,
+                                      fontSize: 16.0);
+                                } else {
+                                  getDate().then((date) {
+                                    DBHelper.insert(
+                                      'receipts',
+                                      {
+                                        'store': controllerName.text,
+                                        'price': controllerPrice.text,
+                                        'image': imageStored.path,
+                                        'date': '4/5/2020',
+                                      },
+                                    );
+                                  });
+
+                                  Navigator.pop(context);
+                                     Fluttertoast.showToast(
+                                      msg: "تم حفظ الفاتورة",
+                                      toastLength: Toast.LENGTH_SHORT,
+                                      gravity: ToastGravity.BOTTOM,
+                                      timeInSecForIosWeb: 1,
+                                      backgroundColor: Colors.green,
+                                      textColor: Colors.white,
+                                      fontSize: 16.0);
+                                }
+                              },
+                              child: Text('تخزين'),
+                            ),
+                          ],
+                        ),
+                      )
+                    : Text(""),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

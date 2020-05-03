@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "469739408387",
+    "firebase_url": "https://receipt-49fc2.firebaseio.com",
+    "project_id": "receipt-49fc2",
+    "storage_bucket": "receipt-49fc2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:469739408387:android:cce02fd7230fa81a1e1236",
+        "android_client_info": {
+          "package_name": "yousef.alyouswf.receipt"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "469739408387-t35u5d3sjglm9i3nn76uk87mlrfrnmmg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAtGt0BV9ClkyInvvfyYraf-j97Ejz6Dp4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "469739408387-t35u5d3sjglm9i3nn76uk87mlrfrnmmg.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
