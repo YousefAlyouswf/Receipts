@@ -33,8 +33,12 @@ class DBHelper {
     if (store == '') {
       return db.rawQuery('SELECT DISTINCT store FROM $table');
     } else {
-      return db.query(table,
-          where: 'store = ?', whereArgs: [store], orderBy: 'date desc', );
+      return db.query(
+        table,
+        where: 'store = ?',
+        whereArgs: [store],
+        orderBy: 'date desc',
+      );
     }
   }
 
@@ -42,5 +46,16 @@ class DBHelper {
     final db = await DBHelper.database();
 
     db.delete(table, where: 'id = ?', whereArgs: [id]);
+  }
+
+  static Future<List<Map<String, dynamic>>> getDataPie(
+    String table,
+  ) async {
+    final db = await DBHelper.database();
+
+    return db.query(
+      table,
+      orderBy: 'store'
+    );
   }
 }
