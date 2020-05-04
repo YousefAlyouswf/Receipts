@@ -69,11 +69,15 @@ class _LoadedState extends State<Loaded> {
       );
     } else {
       return Scaffold(
-        body: Center(
-          child: LinearProgressIndicator(
-            value: 0.5,
-            backgroundColor: Colors.amber,
-            valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+        body: Padding(
+          padding: const EdgeInsets.all(32.0),
+          child: Center(
+            child: LinearProgressIndicator(
+              value: 0.5,
+              backgroundColor: Colors.red[300],
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+              
+            ),
           ),
         ),
       );

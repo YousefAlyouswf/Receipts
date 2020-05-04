@@ -28,17 +28,30 @@ class _StoresScreenState extends State<StoresScreen> {
     });
   }
 
+  List<Color> colorList;
   @override
   void initState() {
     super.initState();
     fetchStore();
+    colorList = [
+      Color(0xFFEBF60A),
+      Color(0xFFFE3216),
+      Color(0xFF58FF4A),
+      Color(0xFF4AECFF),
+      Color(0xFF7B87FF),
+      Color(0xFFAFCEFF),
+      Color(0xFFFFAFF9),
+      Color(0xFFF7DC6F),
+      Color(0xFFA2D9CE),
+      Color(0xFFEDBB99),
+    ];
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("المحلات"),
+        title: Text("المتاجر"),
         centerTitle: true,
         actions: <Widget>[
           IconButton(
@@ -52,7 +65,10 @@ class _StoresScreenState extends State<StoresScreen> {
       ),
       body: Column(
         children: [
-          PieChart(dataMap: widget.dataMap),
+          PieChart(
+            dataMap: widget.dataMap,
+            colorList: colorList,
+          ),
           Expanded(
             child: GridView.builder(
               itemCount: stores.length,
@@ -60,13 +76,8 @@ class _StoresScreenState extends State<StoresScreen> {
                   crossAxisCount: 3),
               itemBuilder: (context, i) {
                 return Container(
+                  color: colorList[i],
                   margin: EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: Colors.grey,
-                      width: 1,
-                    ),
-                  ),
                   child: InkWell(
                     onTap: () {
                       Navigator.push(

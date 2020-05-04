@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:receipt/database/db_helper.dart';
 import 'package:receipt/models/receipt_model.dart';
 
+import 'loaded.dart';
+
 class ReceiptScreen extends StatefulWidget {
   final String storeName;
 
@@ -33,48 +35,68 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
   @override
   Widget build(BuildContext context) {
     fetchReceipts();
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.storeName),
-      ),
-      body: GridView.builder(
-        itemCount: receipts.length,
-        gridDelegate:
-            new SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
-        itemBuilder: (context, i) {
-          return Container(
-            margin: EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              border: Border.all(
-                color: Colors.grey,
-                width: 1,
+    return WillPopScope(
+      onWillPop: () async {
+        return Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => Loaded(),
+          ),
+        );
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(widget.storeName),
+        ),
+        body: GridView.builder(
+          itemCount: receipts.length,
+          gridDelegate:
+              new SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
+          itemBuilder: (context, i) {
+            return Container(
+              margin: EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: Colors.grey,
+                  width: 1,
+                ),
               ),
-            ),
-            child: InkWell(
-              onLongPress: () {
-                DBHelper.deleteItem('receipts', receipts[i].id);
-              },
-              child: Column(
-                children: <Widget>[
-                  Expanded(
-                    child: Container(
-                      child: Image.file(
-                        receipts[i].image,
-                        fit: BoxFit.fill,
-                        width: double.infinity,
+              child: InkWell(
+                onLongPress: () {
+                  DBHelper.deleteItem('receipts', receipts[i].id).then((value) {
+                     if (receipts.length == 1) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => Loaded(),
+                      ),
+                    );
+                  }
+                  });
+                 
+                },
+                child: Column(
+                  children: <Widget>[
+                    Expanded(
+                      child: Container(
+                        child: Image.file(
+                          receipts[i].image,
+                          fit: BoxFit.fill,
+                          width: double.infinity,
+                        ),
                       ),
                     ),
-                  ),
-                  Text(
-                    " ${receipts[i].price} ريال",
-                    textDirection: TextDirection.rtl,
-                  ),
-                  Text(receipts[i].date),
-                ],
+                    Text(
+                      " ${receipts[i].price} ريال",
+                      textDirection: TextDirection.rtl,
+                    ),
+                    Text(receipts[i].date),
+                  ],
+                ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }

@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:receipt/loaded.dart';
 import 'database/db_helper.dart';
 
 class AddNewReceipt extends StatefulWidget {
@@ -172,8 +173,13 @@ class _AddNewReceiptState extends State<AddNewReceipt> {
                                     );
                                   });
 
-                                  Navigator.pop(context);
-                                     Fluttertoast.showToast(
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => Loaded(),
+                                    ),
+                                  );
+                                  Fluttertoast.showToast(
                                       msg: "تم حفظ الفاتورة",
                                       toastLength: Toast.LENGTH_SHORT,
                                       gravity: ToastGravity.BOTTOM,

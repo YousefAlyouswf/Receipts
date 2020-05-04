@@ -31,7 +31,7 @@ class DBHelper {
       String table, String store) async {
     final db = await DBHelper.database();
     if (store == '') {
-      return db.rawQuery('SELECT DISTINCT store FROM $table');
+      return db.query(table, distinct: true, columns: ['store'], orderBy: 'store');
     } else {
       return db.query(
         table,
