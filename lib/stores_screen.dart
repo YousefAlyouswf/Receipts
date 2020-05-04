@@ -4,6 +4,7 @@ import 'package:receipt/models/receipt_model.dart';
 import 'package:receipt/receipt_screen.dart';
 import 'package:pie_chart/pie_chart.dart';
 import 'add_new_receipt.dart';
+import 'package:liquid_progress_indicator/liquid_progress_indicator.dart';
 
 class StoresScreen extends StatefulWidget {
   final Map<String, double> dataMap;
@@ -65,10 +66,41 @@ class _StoresScreenState extends State<StoresScreen> {
       ),
       body: Column(
         children: [
-          PieChart(
-            dataMap: widget.dataMap,
-            colorList: colorList,
-          ),
+          widget.dataMap.isEmpty
+              ? Padding(
+                  padding: const EdgeInsets.only(top: 32.0),
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => AddNewReceipt()));
+                    },
+                    child: Container(
+                      height: MediaQuery.of(context).size.height / 4,
+                      width: MediaQuery.of(context).size.width / 2,
+                      child: LiquidCircularProgressIndicator(
+                        value: 0.25, // Defaults to 0.5.
+                        valueColor: AlwaysStoppedAnimation(Colors
+                            .pink), // Defaults to the current Theme's accentColor.
+                        backgroundColor: Colors
+                            .white, // Defaults to the current Theme's backgroundColor.
+                        borderColor: Colors.red,
+                        borderWidth: 5.0,
+                        direction: Axis
+                            .horizontal, // The direction the liquid moves (Axis.vertical = bottom to top, Axis.horizontal = left to right). Defaults to Axis.vertical.
+                        center: Text(
+                          "إظافة فاتورة جديدة",
+                          textDirection: TextDirection.rtl,
+                        ),
+                      ),
+                    ),
+                  ),
+                )
+              : PieChart(
+                  dataMap: widget.dataMap,
+                  colorList: colorList,
+                ),
           Expanded(
             child: GridView.builder(
               itemCount: stores.length,

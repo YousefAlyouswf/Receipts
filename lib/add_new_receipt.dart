@@ -4,6 +4,9 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:receipt/loaded.dart';
 import 'database/db_helper.dart';
+import 'package:autocomplete_textfield/autocomplete_textfield.dart';
+
+import 'models/receipt_model.dart';
 
 class AddNewReceipt extends StatefulWidget {
   @override
@@ -39,6 +42,31 @@ class _AddNewReceiptState extends State<AddNewReceipt> {
     var now = new DateTime.now();
     String dateReceipt = '${now.day}/${now.month}/${now.year}';
     return dateReceipt;
+  }
+
+  List<ReceiptModel> storesModels = [];
+  List<String> stores = [];
+  Future<void> fetchStore() async {
+    final storeList = await DBHelper.getData('receipts', '');
+    setState(() {
+      storesModels = storeList
+          .map(
+            (item) => ReceiptModel(
+              store: item['store'],
+            ),
+          )
+          .toList();
+    });
+    for (var i = 0; i < storesModels.length; i++) {
+      stores.add(storesModels[i].store);
+    }
+    print(stores);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchStore();
   }
 
   bool visiable = false;
@@ -91,8 +119,8 @@ class _AddNewReceiptState extends State<AddNewReceipt> {
                             Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Container(
-                                height: MediaQuery.of(context).size.height / 4,
-                                width: MediaQuery.of(context).size.width / 3,
+                                height: MediaQuery.of(context).size.height / 6,
+                                width: MediaQuery.of(context).size.width / 4,
                                 child: Image.file(
                                   imageStored,
                                   fit: BoxFit.fill,

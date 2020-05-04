@@ -14,7 +14,6 @@ class _LoadedState extends State<Loaded> {
 
   Map<String, double> dataMap;
   void fetchStore() async {
-    dataMap = new Map();
     final storeList = await DBHelper.getDataPie('receipts');
     setState(() {
       stores = storeList
@@ -49,8 +48,7 @@ class _LoadedState extends State<Loaded> {
         newPrice.add(x);
       }
     }
-    print(newStore);
-    print(newPrice);
+
     for (var i = 0; i < newStore.length; i++) {
       dataMap.putIfAbsent(newStore[i], () => newPrice[i]);
     }
@@ -59,10 +57,18 @@ class _LoadedState extends State<Loaded> {
   @override
   void initState() {
     super.initState();
+    dataMap = new Map();
     fetchStore();
   }
 
   Widget waitLoaded() {
+    if (stores.length > 0) {
+      print('not Empty');
+    } else {
+       return StoresScreen(
+        dataMap: dataMap,
+      );
+    }
     if (dataMap.isNotEmpty) {
       return StoresScreen(
         dataMap: dataMap,
@@ -76,7 +82,6 @@ class _LoadedState extends State<Loaded> {
               value: 0.5,
               backgroundColor: Colors.red[300],
               valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
-              
             ),
           ),
         ),
@@ -86,7 +91,6 @@ class _LoadedState extends State<Loaded> {
 
   @override
   Widget build(BuildContext context) {
-    print(dataMap);
     return waitLoaded();
   }
 }
