@@ -14,6 +14,7 @@ class AddNewReceipt extends StatefulWidget {
 }
 
 class _AddNewReceiptState extends State<AddNewReceipt> {
+  GlobalKey<AutoCompleteTextFieldState<String>> key = new GlobalKey();
   File imageStored;
   TextEditingController controllerName = TextEditingController();
   TextEditingController controllerPrice = TextEditingController();
@@ -60,7 +61,6 @@ class _AddNewReceiptState extends State<AddNewReceipt> {
     for (var i = 0; i < storesModels.length; i++) {
       stores.add(storesModels[i].store);
     }
-    print(stores);
   }
 
   @override
@@ -152,14 +152,12 @@ class _AddNewReceiptState extends State<AddNewReceipt> {
                                   child: Container(
                                     width:
                                         MediaQuery.of(context).size.width / 3,
-                                    child: TextField(
+                                    child: SimpleAutoCompleteTextField(
+                     
+                                      
+                                      key: key,
                                       controller: controllerName,
-                                      autofocus: true,
-                                      keyboardType: TextInputType.text,
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w300,
-                                      ),
-                                      textDirection: TextDirection.rtl,
+                                      suggestions: stores,
                                       decoration: InputDecoration(
                                           labelText: 'المتجر',
                                           border: OutlineInputBorder()),
@@ -170,6 +168,7 @@ class _AddNewReceiptState extends State<AddNewReceipt> {
                             ),
                             FlatButton(
                               onPressed: () {
+                                print("--->>${key.currentContext}");
                                 if (controllerName.text.isEmpty) {
                                   Fluttertoast.showToast(
                                       msg: "أسم المتجر",
