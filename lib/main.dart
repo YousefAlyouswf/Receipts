@@ -12,6 +12,9 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
        
         primarySwatch: Colors.blue,
+        secondaryHeaderColor: Colors.brown,
+       // cardColor: Color(0xFF008080),
+       // textSelectionColor: Colors.white
       ),
       home: Loaded(),
     );

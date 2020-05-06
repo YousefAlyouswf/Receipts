@@ -35,16 +35,21 @@ class _StoresScreenState extends State<StoresScreen> {
     super.initState();
     fetchStore();
     colorList = [
-      Color(0xFFEBF60A),
-      Color(0xFFFE3216),
-      Color(0xFF58FF4A),
-      Color(0xFF4AECFF),
-      Color(0xFF7B87FF),
-      Color(0xFFAFCEFF),
-      Color(0xFFFFAFF9),
+      Color(0xFF0B84A5),
+      Color(0xFFF6C85F),
+      Color(0xFF6F4E7C),
+      Color(0xFF9DD866),
+      Color(0xFFCA472F),
+      Color(0xFFFFA056),
+      Color(0xFF8DDDD0),
+
       Color(0xFFF7DC6F),
       Color(0xFFA2D9CE),
       Color(0xFFEDBB99),
+      Color(0xFFcddaab),
+      Color(0xFF7cae0f),
+      Color(0xFF2e84d5),
+      Color(0xFFe88b4b),
     ];
   }
 
@@ -66,8 +71,8 @@ class _StoresScreenState extends State<StoresScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-           Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => AddNewReceipt()));
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => AddNewReceipt()));
         },
         child: Icon(Icons.add),
       ),
@@ -107,6 +112,8 @@ class _StoresScreenState extends State<StoresScreen> {
               : PieChart(
                   dataMap: widget.dataMap,
                   colorList: colorList,
+                  showLegends: false,
+                  chartRadius: MediaQuery.of(context).size.width / 2,
                 ),
           Expanded(
             child: GridView.builder(
@@ -115,7 +122,11 @@ class _StoresScreenState extends State<StoresScreen> {
                   crossAxisCount: 3),
               itemBuilder: (context, i) {
                 return Container(
-                  color: colorList[i],
+                  decoration: new BoxDecoration( 
+                    color: colorList[i],
+                     borderRadius: new BorderRadius.all(Radius.circular(5))
+                  ),
+                 
                   margin: EdgeInsets.all(10),
                   child: InkWell(
                     onTap: () {
@@ -131,7 +142,7 @@ class _StoresScreenState extends State<StoresScreen> {
                     child: Center(
                       child: Text(
                         stores[i].store,
-                        style: Theme.of(context).textTheme.bodyText1,
+                        style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 18),
                       ),
                     ),
                   ),

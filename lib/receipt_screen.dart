@@ -17,10 +17,9 @@ class ReceiptScreen extends StatefulWidget {
 
 class _ReceiptScreenState extends State<ReceiptScreen> {
   List<ReceiptModel> receipts = [];
-  List<List<ReceiptModel>> receiptList = [];
   List<String> dateList = [];
   var dateSort = [];
-  var tList = [];
+  double sumPrice = 0;
   Future<void> fetchReceipts() async {
     final dataList = await DBHelper.getData('receipts', widget.storeName);
     setState(() {
@@ -43,6 +42,11 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
       dateList.add(receipts[i].date);
     }
     dateSort = dateList.toSet().toList();
+
+    sumPrice = 0;
+    for (var i = 0; i < receipts.length; i++) {
+      sumPrice += double.parse(receipts[i].price);
+    }
   }
 
   @override
@@ -128,73 +132,101 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
           title: Text(widget.storeName),
           centerTitle: true,
         ),
-        body: GridView.builder(
-          physics: ClampingScrollPhysics(),
-          shrinkWrap: true,
-          itemCount: receipts.length,
-          gridDelegate:
-              new SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
-          itemBuilder: (context, i) {
-            return Container(
-              margin: EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                border: Border.all(
-                  color: Colors.grey,
-                  width: 1,
+        body: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(
+                  top: 16.0, bottom: 16.0, left: 32, right: 32),
+              child: Container(
+                width: double.infinity,
+                //height: MediaQuery.of(context).size.height * 0.05,
+                child: Card(
+                  elevation: 10,
+                  child: Center(
+                      child: Text(
+                    '$sumPrice ريال ',
+                    textDirection: TextDirection.rtl,
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  )),
                 ),
               ),
-              child: InkWell(
-                onLongPress: () {
-                  _showDialog(receipts[i].id);
-                },
-                onTap: () {
-                  //   openImage(receipts[i].image);
-                  Navigator.of(context).push(
-                    new MaterialPageRoute<Null>(
-                      builder: (BuildContext context) {
-                        return Container(
-                          color: Colors.transparent,
-                          child: Dialog(
-                            child: Container(
-                              height: MediaQuery.of(context).size.height,
-                              width: MediaQuery.of(context).size.width,
-                              child: PhotoView(
-                                imageProvider: FileImage(
-                                  receipts[i].image,
+            ),
+            Expanded(
+              child: GridView.builder(
+                physics: ClampingScrollPhysics(),
+                shrinkWrap: true,
+                itemCount: receipts.length,
+                gridDelegate: new SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2),
+                itemBuilder: (context, i) {
+                  return Container(
+                    margin: EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: Colors.grey,
+                        width: 1,
+                      ),
+                    ),
+                    child: InkWell(
+                      onLongPress: () {
+                        _showDialog(receipts[i].id);
+                      },
+                      onTap: () {
+                        //   openImage(receipts[i].image);
+                        Navigator.of(context).push(
+                          new MaterialPageRoute<Null>(
+                            builder: (BuildContext context) {
+                              return Container(
+                                color: Colors.transparent,
+                                child: Dialog(
+                                  child: Container(
+                                    height: MediaQuery.of(context).size.height,
+                                    width: MediaQuery.of(context).size.width,
+                                    child: PhotoView(
+                                      imageProvider: FileImage(
+                                        receipts[i].image,
+                                      ),
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            ),
+                              );
+                            },
+                            fullscreenDialog: true,
                           ),
                         );
                       },
-                      fullscreenDialog: true,
+                      child: Column(
+                        children: <Widget>[
+                          Expanded(
+                            child: Container(
+                              child: Image.file(
+                                receipts[i].image,
+                                fit: BoxFit.fill,
+                                width: double.infinity,
+                              ),
+                            ),
+                          ),
+                          Container(
+                           
+                            width: double.infinity,
+                            child: Column(
+                              children: [
+                                Text(
+                                  " ${receipts[i].price} ريال",
+                                  textDirection: TextDirection.rtl,
+                                ),
+                                Text(receipts[i].date),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   );
                 },
-                child: Column(
-                  children: <Widget>[
-                    Expanded(
-                      child: Container(
-                        child: Image.file(
-                          receipts[i].image,
-                          fit: BoxFit.fill,
-                          width: double.infinity,
-                        ),
-                      ),
-                      // child: PhotoView(
-                      //   imageProvider: FileImage(receipts[i].image,),
-                      // ),
-                    ),
-                    Text(
-                      " ${receipts[i].price} ريال",
-                      textDirection: TextDirection.rtl,
-                    ),
-                    Text(receipts[i].date),
-                  ],
-                ),
               ),
-            );
-          },
+            ),
+          ],
         ),
       ),
     );
