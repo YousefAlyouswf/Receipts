@@ -5,7 +5,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:receipt/loaded.dart';
 import 'database/db_helper.dart';
 import 'package:autocomplete_textfield/autocomplete_textfield.dart';
-
 import 'models/receipt_model.dart';
 
 class AddNewReceipt extends StatefulWidget {
@@ -77,39 +76,27 @@ class _AddNewReceiptState extends State<AddNewReceipt> {
         title: Text("أدخل الفاتورة"),
         centerTitle: true,
       ),
+      floatingActionButton: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          FloatingActionButton(
+            heroTag: "btn1",
+            onPressed: _takeFromGalary,
+            child: Icon(Icons.image),
+          ),
+          FloatingActionButton(
+            heroTag: "btn2",
+            onPressed: _takePicture,
+            child: Icon(Icons.camera_alt),
+          ),
+        ],
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       body: Container(
         width: double.infinity,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
-            Container(
-              width: double.infinity,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: <Widget>[
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      IconButton(
-                        onPressed: _takePicture,
-                        icon: Icon(Icons.camera),
-                        color: Colors.blue,
-                      ),
-                      SizedBox(
-                        width: 10,
-                      ),
-                      IconButton(
-                        onPressed: _takeFromGalary,
-                        icon: Icon(Icons.image),
-                        color: Colors.blue,
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
             Expanded(
               child: Container(
                 child: imageStored != null
@@ -153,8 +140,6 @@ class _AddNewReceiptState extends State<AddNewReceipt> {
                                     width:
                                         MediaQuery.of(context).size.width / 3,
                                     child: SimpleAutoCompleteTextField(
-                     
-                                      
                                       key: key,
                                       controller: controllerName,
                                       suggestions: stores,
@@ -195,7 +180,7 @@ class _AddNewReceiptState extends State<AddNewReceipt> {
                                         'store': controllerName.text,
                                         'price': controllerPrice.text,
                                         'image': imageStored.path,
-                                        'date': '4/5/2020',
+                                        'date': date,
                                       },
                                     );
                                   });
@@ -221,7 +206,12 @@ class _AddNewReceiptState extends State<AddNewReceipt> {
                           ],
                         ),
                       )
-                    : Text(""),
+                    : Center(
+                        child: Text(
+                          "أختر صورة الفاتورة",
+                          style: TextStyle(fontSize: 25),
+                        ),
+                      ),
               ),
             ),
           ],

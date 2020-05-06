@@ -37,7 +37,7 @@ class DBHelper {
         table,
         where: 'store = ?',
         whereArgs: [store],
-        orderBy: 'date desc',
+        orderBy: 'date desc, id desc',
       );
     }
   }

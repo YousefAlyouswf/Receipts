@@ -64,6 +64,13 @@ class _StoresScreenState extends State<StoresScreen> {
           ),
         ],
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+           Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => AddNewReceipt()));
+        },
+        child: Icon(Icons.add),
+      ),
       body: Column(
         children: [
           widget.dataMap.isEmpty
