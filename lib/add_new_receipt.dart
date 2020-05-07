@@ -74,7 +74,6 @@ class _AddNewReceiptState extends State<AddNewReceipt> {
     fetchStore();
   }
 
-  bool visiable = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -146,6 +145,7 @@ class _AddNewReceiptState extends State<AddNewReceipt> {
                                     width:
                                         MediaQuery.of(context).size.width / 3,
                                     child: SimpleAutoCompleteTextField(
+                                       
                                       key: key,
                                       controller: controllerName,
                                       suggestions: stores,

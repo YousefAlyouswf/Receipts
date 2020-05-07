@@ -31,7 +31,8 @@ class DBHelper {
       String table, String store) async {
     final db = await DBHelper.database();
     if (store == '') {
-      return db.query(table, distinct: true, columns: ['store'], orderBy: 'store');
+      return db.query(table,
+          distinct: true, columns: ['store'], orderBy: 'store');
     } else {
       return db.query(
         table,
@@ -53,9 +54,47 @@ class DBHelper {
   ) async {
     final db = await DBHelper.database();
 
+    return db.query(table, orderBy: 'store');
+  }
+
+  // Add Friend to Database-------------------------------------
+
+  static Future<Database> databaseFriend() async {
+    final dbPath = await sqlite.getDatabasesPath();
+    return sqlite.openDatabase(
+      path.join(
+        dbPath,
+        'friend.db',
+      ),
+      onCreate: (db, version) {
+        db.execute(
+            "CREATE TABLE friend(id INTEGER PRIMARY KEY AUTOINCREMENT, code TEXT, name TEXT)");
+      },
+      version: 1,
+    );
+  }
+
+  static Future<void> insertFriend(
+      String table, Map<String, Object> data) async {
+    final db = await DBHelper.databaseFriend();
+    db.insert(
+      table,
+      data,
+    );
+  }
+
+  static Future<List<Map<String, dynamic>>> getDataFriend(
+      String table) async {
+    final db = await DBHelper.databaseFriend();
+
     return db.query(
       table,
-      orderBy: 'store'
+      orderBy: 'id desc',
     );
+  }
+  static Future<void> deleteFriend(String table, int id) async {
+    final db = await DBHelper.databaseFriend();
+
+    db.delete(table, where: 'id = ?', whereArgs: [id]);
   }
 }

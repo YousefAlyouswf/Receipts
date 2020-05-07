@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:receipt/database/db_helper.dart';
 import 'package:receipt/models/receipt_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:receipt/show_other_receipt/other_receipt.dart';
@@ -10,7 +11,10 @@ import '../loaded.dart';
 
 class ShowReceipts extends StatefulWidget {
   final String textCode;
-  ShowReceipts({Key key, this.textCode}) : super(key: key);
+  final String name;
+  final bool saved;
+  ShowReceipts({Key key, this.textCode, this.name, this.saved})
+      : super(key: key);
 
   @override
   _ShowReceiptsState createState() => _ShowReceiptsState();
@@ -36,6 +40,18 @@ class _ShowReceiptsState extends State<ShowReceipts> {
       setState(() {
         receipts = testModel;
       });
+
+      // Here add friend to data base
+      if (widget.saved) {
+      } else {
+        DBHelper.insertFriend(
+          'friend',
+          {
+            'code': widget.textCode,
+            'name': widget.name,
+          },
+        );
+      }
     } catch (e) {
       Fluttertoast.showToast(
           msg: "خطأ في إدخال الكود",
@@ -74,7 +90,6 @@ class _ShowReceiptsState extends State<ShowReceipts> {
 
   @override
   Widget build(BuildContext context) {
-    fetch();
     return WillPopScope(
       onWillPop: () async {
         return Navigator.push(
@@ -86,7 +101,7 @@ class _ShowReceiptsState extends State<ShowReceipts> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: Text('فواتير الغير'),
+          title: Text(widget.name),
           centerTitle: true,
         ),
         body: GridView.builder(

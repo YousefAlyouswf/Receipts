@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:receipt/database/db_helper.dart';
+import 'package:receipt/models/friends_model.dart';
 import 'package:receipt/models/receipt_model.dart';
 import 'package:receipt/receipt_screen.dart';
 import 'package:pie_chart/pie_chart.dart';
@@ -59,93 +60,122 @@ class _StoresScreenState extends State<StoresScreen> {
   void _showDialog(int id) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     TextEditingController codeText = TextEditingController();
+    TextEditingController friendName = TextEditingController();
 
-    if (prefs.getString('uuid') == null) {
-      Fluttertoast.showToast(
-          msg: "يجب تسجيل فاتورة",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.grey,
-          textColor: Colors.white,
-          fontSize: 16.0);
-    } else {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          if (id == 0) {
-            return AlertDialog(
-              title: new Text(
-                "رقم عرض الفواتير",
-                textDirection: TextDirection.rtl,
+    Navigator.of(context).pop();
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        if (id == 0) {
+          return AlertDialog(
+            title: new Text(
+              "رقم عرض الفواتير",
+              textDirection: TextDirection.rtl,
+            ),
+            content: Text(
+              prefs.getString('uuid'),
+            ),
+            actions: <Widget>[
+              new FlatButton(
+                child: new Text("إلغاء"),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
               ),
-              content: Text(
-                prefs.getString('uuid'),
+              new FlatButton(
+                child: new Text("نسخ"),
+                onPressed: () {
+                  Clipboard.setData(
+                      new ClipboardData(text: prefs.getString('uuid')));
+                  Navigator.of(context).pop();
+                  Fluttertoast.showToast(
+                      msg: "تم النسخ",
+                      toastLength: Toast.LENGTH_SHORT,
+                      gravity: ToastGravity.BOTTOM,
+                      timeInSecForIosWeb: 1,
+                      backgroundColor: Colors.grey,
+                      textColor: Colors.white,
+                      fontSize: 16.0);
+                },
               ),
-              actions: <Widget>[
-                new FlatButton(
-                  child: new Text("إلغاء"),
+            ],
+          );
+        } else if (id == 1) {
+          return AlertDialog(
+            title: new Text(
+              "أدخل رقم الكود",
+              textDirection: TextDirection.rtl,
+            ),
+            content: Container(
+              height: MediaQuery.of(context).size.height * 0.2,
+              child: Column(
+                children: [
+                  TextField(
+                    textAlign: TextAlign.end,
+                    controller: codeText,
+                    decoration: new InputDecoration(
+                      border: OutlineInputBorder(),
+                      hintText: "رقم الكود",
+                    ),
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  TextField(
+                    textAlign: TextAlign.end,
+                    controller: friendName,
+                    decoration: new InputDecoration(
+                        border: OutlineInputBorder(), hintText: "أسم الصديق"),
+                  ),
+                ],
+              ),
+            ),
+            actions: <Widget>[
+              new FlatButton(
+                child: new Text("إلغاء"),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              new FlatButton(
+                  child: new Text("عرض"),
                   onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-                new FlatButton(
-                  child: new Text("نسخ"),
-                  onPressed: () {
-                    Clipboard.setData(
-                        new ClipboardData(text: prefs.getString('uuid')));
-                    Navigator.of(context).pop();
-                    Fluttertoast.showToast(
-                        msg: "تم النسخ",
+                    if (codeText.text == '' || friendName.text == '') {
+                      Fluttertoast.showToast(
+                        msg: "يجب تعبئة الحقول",
                         toastLength: Toast.LENGTH_SHORT,
                         gravity: ToastGravity.BOTTOM,
                         timeInSecForIosWeb: 1,
                         backgroundColor: Colors.grey,
                         textColor: Colors.white,
-                        fontSize: 16.0);
-                  },
-                ),
-              ],
-            );
-          } else if (id == 1) {
-            return AlertDialog(
-              title: new Text(
-                "أدخل رقم الكود",
-                textDirection: TextDirection.rtl,
-              ),
-              content: TextField(
-                controller: codeText,
-              ),
-              actions: <Widget>[
-                new FlatButton(
-                  child: new Text("إلغاء"),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-                new FlatButton(
-                    child: new Text("عرض"),
-                    onPressed: () {
+                        fontSize: 16.0,
+                      );
+                    } else {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => ShowReceipts(
                             textCode: codeText.text,
+                            name: friendName.text,
                           ),
                         ),
                       );
-                    }),
-              ],
-            );
-          } else {
-            return null;
-          }
-        },
-      );
-    }
+                    }
+                  }),
+            ],
+          );
+        } else {
+          return null;
+        }
+      },
+    );
   }
 
-  List<String> services = ['عرض الرقم', 'فواتير صديق '];
+  List<String> services = [
+    'عرض الرقم',
+    'فواتير صديق جديد',
+    'فواتير أصدقاء مخزنة',
+  ];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -154,15 +184,97 @@ class _StoresScreenState extends State<StoresScreen> {
         centerTitle: true,
       ),
       endDrawer: Drawer(
-        child: ListView.builder(
-            itemCount: 2,
+        child: DrawerHeader(
+          child: ListView.builder(
+            itemCount: services.length,
             itemBuilder: (ctx, i) {
               return ListTile(
-                onTap: () {
+                onTap: () async {
                   if (i == 0) {
                     _showDialog(i);
                   } else if (i == 1) {
                     _showDialog(i);
+                  } else if (i == 2) {
+                    List<Friends> frindes = [];
+                    final storeList = await DBHelper.getDataFriend('friend');
+                    setState(() {
+                      frindes = storeList
+                          .map(
+                            (item) => Friends(
+                              id: item['id'],
+                              name: item['name'],
+                              code: item['code'],
+                            ),
+                          )
+                          .toList();
+                    });
+                    showModalBottomSheet(
+                      backgroundColor: Colors.white,
+                      context: context,
+                      builder: (context) => frindes.length == 0
+                          ? Center(
+                              child: Text(
+                                "لا يوجد أصدقاء",
+                                style: TextStyle(
+                                    fontSize: 24, color: Colors.black),
+                              ),
+                            )
+                          : Container(
+                              color: Colors.white,
+                              height: MediaQuery.of(context).size.height,
+                              width: MediaQuery.of(context).size.width,
+                              child: ListView.builder(
+                                itemCount: frindes.length,
+                                itemBuilder: (ctx, index) {
+                                  return Padding(
+                                    padding: const EdgeInsets.all(32.0),
+                                    child: Card(
+                                      child: ListTile(
+                                        title: Text(
+                                          frindes[index].name,
+                                          textDirection: TextDirection.rtl,
+                                          style: TextStyle(
+                                            fontSize: 24,
+                                            color: Colors.black,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        subtitle: Text(
+                                          frindes[index].code,
+                                          textDirection: TextDirection.rtl,
+                                          style: TextStyle(
+                                              color: Colors.grey, fontSize: 12),
+                                        ),
+                                        leading: IconButton(
+                                          icon: Icon(Icons.delete),
+                                          color: Colors.red,
+                                          onPressed: () async {
+                                            DBHelper.deleteFriend(
+                                              'friend',
+                                              frindes[index].id,
+                                            );
+                                          },
+                                        ),
+                                        onTap: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  ShowReceipts(
+                                                saved: true,
+                                                textCode: frindes[index].code,
+                                                name: frindes[index].name,
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                    );
                   }
                 },
                 title: Card(
@@ -177,7 +289,9 @@ class _StoresScreenState extends State<StoresScreen> {
                   ),
                 ),
               );
-            }),
+            },
+          ),
+        ),
       ),
       floatingActionButton: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,

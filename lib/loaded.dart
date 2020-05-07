@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:receipt/stores_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:uuid/uuid.dart';
 
 import 'database/db_helper.dart';
 import 'models/receipt_model.dart';
@@ -54,18 +56,27 @@ class _LoadedState extends State<Loaded> {
     }
   }
 
+  void setUserId() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    if (prefs.getString('uuid') == null) {
+      var uuid = Uuid();
+      prefs.setString('uuid', uuid.v1());
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     dataMap = new Map();
     fetchStore();
+    setUserId();
   }
 
   Widget waitLoaded() {
     if (stores.length > 0) {
       print('not Empty');
     } else {
-       return StoresScreen(
+      return StoresScreen(
         dataMap: dataMap,
       );
     }
