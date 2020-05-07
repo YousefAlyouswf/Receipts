@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'dart:io';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
@@ -6,6 +8,9 @@ import 'package:receipt/loaded.dart';
 import 'database/db_helper.dart';
 import 'package:autocomplete_textfield/autocomplete_textfield.dart';
 import 'models/receipt_model.dart';
+import 'package:http/http.dart' as http;
+import 'package:uuid/uuid.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AddNewReceipt extends StatefulWidget {
   @override
@@ -15,6 +20,7 @@ class AddNewReceipt extends StatefulWidget {
 class _AddNewReceiptState extends State<AddNewReceipt> {
   GlobalKey<AutoCompleteTextFieldState<String>> key = new GlobalKey();
   File imageStored;
+  String urlImage;
   TextEditingController controllerName = TextEditingController();
   TextEditingController controllerPrice = TextEditingController();
   _takePicture() async {
@@ -152,8 +158,7 @@ class _AddNewReceiptState extends State<AddNewReceipt> {
                               ],
                             ),
                             FlatButton(
-                              onPressed: () {
-                                print("--->>${key.currentContext}");
+                              onPressed: () async {
                                 if (controllerName.text.isEmpty) {
                                   Fluttertoast.showToast(
                                       msg: "أسم المتجر",
@@ -173,7 +178,8 @@ class _AddNewReceiptState extends State<AddNewReceipt> {
                                       textColor: Colors.white,
                                       fontSize: 16.0);
                                 } else {
-                                  getDate().then((date) {
+                                  uploadImage();
+                                  getDate().then((date) async {
                                     DBHelper.insert(
                                       'receipts',
                                       {
@@ -183,6 +189,8 @@ class _AddNewReceiptState extends State<AddNewReceipt> {
                                         'date': date,
                                       },
                                     );
+                                  }).catchError((onError) {
+                                    print(onError);
                                   });
 
                                   Navigator.push(
@@ -218,5 +226,55 @@ class _AddNewReceiptState extends State<AddNewReceipt> {
         ),
       ),
     );
+  }
+
+  Future uploadImage() async {
+    String fileName = '${DateTime.now()}.png';
+
+    StorageReference firebaseStorage =
+        FirebaseStorage.instance.ref().child(fileName);
+
+    StorageUploadTask uploadTask = firebaseStorage.putFile(imageStored);
+    await uploadTask.onComplete;
+    urlImage = await firebaseStorage.getDownloadURL() as String;
+
+    if (urlImage.isNotEmpty) {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      getDate().then((date) {
+        if (prefs.getString('uuid') == null || prefs.getString('uuid') == '') {
+          var uuid = Uuid();
+          prefs.setString('uuid', uuid.v1());
+          String userID = prefs.getString('uuid');
+          String url =
+              "https://receipt-49fc2.firebaseio.com/$userID/${controllerName.text}.json";
+          http.post(
+            url,
+            body: json.encode(
+              {
+                'store': controllerName.text,
+                'price': controllerPrice.text,
+                'image': urlImage,
+                'date': date,
+              },
+            ),
+          );
+        } else {
+          String userID = prefs.getString('uuid');
+          String url =
+              "https://receipt-49fc2.firebaseio.com/$userID/${controllerName.text}.json";
+          http.post(
+            url,
+            body: json.encode(
+              {
+                'store': controllerName.text,
+                'price': controllerPrice.text,
+                'image': urlImage,
+                'date': date,
+              },
+            ),
+          );
+        }
+      });
+    }
   }
 }

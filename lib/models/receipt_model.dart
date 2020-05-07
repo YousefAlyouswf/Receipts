@@ -6,6 +6,7 @@ class ReceiptModel {
   final String price;
   final File image;
   final String date;
+  final String onlineImage;
   final List<ReceiptModel> listModel;
   ReceiptModel({
     this.id,
@@ -14,5 +15,6 @@ class ReceiptModel {
     this.image,
     this.date,
     this.listModel,
+    this.onlineImage,
   });
 }

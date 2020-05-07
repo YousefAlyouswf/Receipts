@@ -36,12 +36,7 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
           .toList();
     });
 
-    dateList = [];
-    dateSort = [];
-    for (var i = 0; i < receipts.length; i++) {
-      dateList.add(receipts[i].date);
-    }
-    dateSort = dateList.toSet().toList();
+   
 
     sumPrice = 0;
     for (var i = 0; i < receipts.length; i++) {
