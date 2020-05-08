@@ -21,6 +21,7 @@ class StoresScreen extends StatefulWidget {
 
 class _StoresScreenState extends State<StoresScreen> {
   List<ReceiptModel> stores = [];
+  var map = Map();
   Future<void> fetchStore() async {
     final storeList = await DBHelper.getData('receipts', '');
     setState(() {
@@ -34,11 +35,44 @@ class _StoresScreenState extends State<StoresScreen> {
     });
   }
 
+  List<ReceiptModel> receiptCount = [];
+  Future<void> countTheReceipts() async {
+    final storeList = await DBHelper.receiptCount('receipts');
+    setState(() {
+      receiptCount = storeList
+          .map(
+            (item) => ReceiptModel(
+              store: item['store'],
+            ),
+          )
+          .toList();
+    });
+    List<String> store = [];
+    for (var i = 0; i < receiptCount.length; i++) {
+      store.add(receiptCount[i].store);
+    }
+
+    print(store);
+
+    
+
+    store.forEach((element) {
+      if (!map.containsKey(element)) {
+        map[element] = 1;
+      } else {
+        map[element] += 1;
+      }
+    });
+
+    print(map['يوسف']);
+  }
+
   List<Color> colorList;
   @override
   void initState() {
     super.initState();
     fetchStore();
+    countTheReceipts();
     colorList = [
       Color(0xFF0B84A5),
       Color(0xFFF6C85F),
@@ -403,23 +437,35 @@ class _StoresScreenState extends State<StoresScreen> {
                               ),
                             );
                           },
-                          child: Align(
-                            alignment: Alignment(0, -0.25),
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: FittedBox(
-                                fit: BoxFit.contain,
-                                child: Text(
-                                  stores[i].store,
-                                  textDirection: TextDirection.rtl,
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 18),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              SizedBox(
+                                height: 20,
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: FittedBox(
+                                  fit: BoxFit.contain,
+                                  child: Text(
+                                    stores[i].store,
+                                    textDirection: TextDirection.rtl,
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 18),
+                                  ),
                                 ),
                               ),
-                            ),
+                              SizedBox(
+                                height: 15,
+                              ),
+                              Text(
+                                "الفواتير ${map[stores[i].store].toString()}",
+                                textDirection: TextDirection.rtl,
+                              )
+                            ],
                           ),
                         ),
                       );

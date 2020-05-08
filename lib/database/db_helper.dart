@@ -43,6 +43,14 @@ class DBHelper {
     }
   }
 
+  static Future<List<Map<String, dynamic>>> receiptCount(String table) async {
+    final db = await DBHelper.database();
+
+    return db.query(
+      table,
+    );
+  }
+
   static Future<void> deleteItem(String table, int id) async {
     final db = await DBHelper.database();
 
@@ -83,8 +91,7 @@ class DBHelper {
     );
   }
 
-  static Future<List<Map<String, dynamic>>> getDataFriend(
-      String table) async {
+  static Future<List<Map<String, dynamic>>> getDataFriend(String table) async {
     final db = await DBHelper.databaseFriend();
 
     return db.query(
@@ -92,6 +99,7 @@ class DBHelper {
       orderBy: 'id desc',
     );
   }
+
   static Future<void> deleteFriend(String table, int id) async {
     final db = await DBHelper.databaseFriend();
 
