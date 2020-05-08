@@ -22,7 +22,7 @@ class ShowReceipts extends StatefulWidget {
 
 class _ShowReceiptsState extends State<ShowReceipts> {
   List<ReceiptModel> receipts = [];
-
+ var map = Map();
   void fetch() async {
     try {
       String url =
@@ -40,7 +40,24 @@ class _ShowReceiptsState extends State<ShowReceipts> {
       setState(() {
         receipts = testModel;
       });
+List<String> store = [];
+    for (var i = 0; i < receipts.length; i++) {
+      store.add(receipts[i].store);
+    }
 
+    print(store);
+
+    
+
+    store.forEach((element) {
+      if (!map.containsKey(element)) {
+        map[element] = 1;
+      } else {
+        map[element] += 1;
+      }
+    });
+
+    print(map['يوسف']);
       // Here add friend to data base
       if (widget.saved) {
       } else {
@@ -70,7 +87,8 @@ class _ShowReceiptsState extends State<ShowReceipts> {
   void initState() {
     super.initState();
     fetch();
-    colorList = [ Color(0xFFF7DC6F),
+    colorList = [
+      Color(0xFFF7DC6F),
       Color(0xFFA2D9CE),
       Color(0xFFEDBB99),
       Color(0xFFcddaab),
@@ -84,7 +102,6 @@ class _ShowReceiptsState extends State<ShowReceipts> {
       Color(0xFFCA472F),
       Color(0xFFFFA056),
       Color(0xFF8DDDD0),
-     
     ];
   }
 
@@ -101,7 +118,7 @@ class _ShowReceiptsState extends State<ShowReceipts> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: Text(widget.name),
+          title: Text("محفظة ${widget.name}", textDirection: TextDirection.rtl,),
           centerTitle: true,
         ),
         body: GridView.builder(
@@ -110,12 +127,17 @@ class _ShowReceiptsState extends State<ShowReceipts> {
               new SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3),
           itemBuilder: (context, i) {
             return Container(
-              decoration: new BoxDecoration(
-                color: colorList[i],
-                borderRadius: new BorderRadius.all(
-                  Radius.circular(5),
-                ),
-              ),
+               decoration: new BoxDecoration(
+                          borderRadius:
+                              new BorderRadius.all(Radius.circular(15)),
+                          image: DecorationImage(
+                              colorFilter: ColorFilter.mode(
+                                  colorList[i], BlendMode.srcATop),
+                              image: AssetImage(
+                                'assets/images/wallet.png',
+                              ),
+                              fit: BoxFit.fitHeight),
+                        ),
               margin: EdgeInsets.all(10),
               child: InkWell(
                 onTap: () {
@@ -129,15 +151,36 @@ class _ShowReceiptsState extends State<ShowReceipts> {
                     ),
                   );
                 },
-                child: Center(
-                  child: Text(
-                    receipts[i].store,
-                    style: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18),
-                  ),
-                ),
+                child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              SizedBox(
+                                height: 20,
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: FittedBox(
+                                  fit: BoxFit.contain,
+                                  child: Text(
+                                    receipts[i].store,
+                                    textDirection: TextDirection.rtl,
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 18),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(
+                                height: 15,
+                              ),
+                              Text(
+                                "الفواتير ${map[receipts[i].store].toString()}",
+                                textDirection: TextDirection.rtl,
+                              )
+                            ],
+                          ),
               ),
             );
           },

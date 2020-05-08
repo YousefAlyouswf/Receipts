@@ -12,7 +12,7 @@ class DBHelper {
       ),
       onCreate: (db, version) {
         db.execute(
-            "CREATE TABLE receipts(id INTEGER PRIMARY KEY AUTOINCREMENT, store TEXT, price TEXT, image TEXT, date TEXT)");
+            "CREATE TABLE receipts(id INTEGER PRIMARY KEY AUTOINCREMENT, store TEXT, price TEXT, image TEXT, date TEXT, key TEXT)");
       },
       version: 1,
     );

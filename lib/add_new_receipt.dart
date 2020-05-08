@@ -21,6 +21,8 @@ class AddNewReceipt extends StatefulWidget {
 }
 
 class _AddNewReceiptState extends State<AddNewReceipt> {
+  var uuid = Uuid();
+  String itemID;
   GlobalKey<AutoCompleteTextFieldState<String>> key = new GlobalKey();
   File imageStored;
   String urlImage;
@@ -79,6 +81,7 @@ class _AddNewReceiptState extends State<AddNewReceipt> {
   void initState() {
     super.initState();
     fetchStore();
+    itemID = uuid.v1();
   }
 
   @override
@@ -193,6 +196,7 @@ class _AddNewReceiptState extends State<AddNewReceipt> {
                                         'price': controllerPrice.text,
                                         'image': imageStored.path,
                                         'date': date,
+                                        'key': itemID,
                                       },
                                     );
                                   }).catchError((onError) {
@@ -248,7 +252,6 @@ class _AddNewReceiptState extends State<AddNewReceipt> {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       getDate().then((date) {
         if (prefs.getString('uuid') == null || prefs.getString('uuid') == '') {
-          var uuid = Uuid();
           prefs.setString('uuid', uuid.v1());
           String userID = prefs.getString('uuid');
           String url =
@@ -261,6 +264,7 @@ class _AddNewReceiptState extends State<AddNewReceipt> {
                 'price': controllerPrice.text,
                 'image': urlImage,
                 'date': date,
+                'id': itemID,
               },
             ),
           );
@@ -276,6 +280,7 @@ class _AddNewReceiptState extends State<AddNewReceipt> {
                 'price': controllerPrice.text,
                 'image': urlImage,
                 'date': date,
+                'id': itemID,
               },
             ),
           );

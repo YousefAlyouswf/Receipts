@@ -215,7 +215,7 @@ class _StoresScreenState extends State<StoresScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("فواتيري"),
+        title: Text("محفظتي"),
         centerTitle: true,
       ),
       endDrawer: Drawer(
@@ -420,8 +420,8 @@ class _StoresScreenState extends State<StoresScreen> {
                           image: DecorationImage(
                               colorFilter: ColorFilter.mode(
                                   colorList[i], BlendMode.srcATop),
-                              image: NetworkImage(
-                                'https://image.flaticon.com/icons/png/512/83/83203.png',
+                              image: AssetImage(
+                                'assets/images/wallet.png',
                               ),
                               fit: BoxFit.fitHeight),
                         ),

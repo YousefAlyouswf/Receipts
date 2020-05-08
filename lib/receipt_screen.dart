@@ -1,10 +1,13 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 import 'package:receipt/database/db_helper.dart';
 import 'package:receipt/models/receipt_model.dart';
 import 'loaded.dart';
 import 'package:photo_view/photo_view.dart';
-import 'package:photo_view/photo_view_gallery.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ReceiptScreen extends StatefulWidget {
   final String storeName;
@@ -31,17 +34,18 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
               price: item['price'],
               image: File(item['image']),
               date: item['date'],
+              itemID: item['key'],
             ),
           )
           .toList();
     });
 
-   
-
     sumPrice = 0;
     for (var i = 0; i < receipts.length; i++) {
       sumPrice += double.parse(receipts[i].price);
     }
+
+   
   }
 
   @override
@@ -50,7 +54,7 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
     fetchReceipts();
   }
 
-  void _showDialog(int id) {
+  void _showDialog(int id, String idFirebase) {
     // flutter defined function
     showDialog(
       context: context,
@@ -73,6 +77,7 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
             new FlatButton(
               child: new Text("حذف"),
               onPressed: () {
+                deleteFromFirebase(idFirebase);
                 DBHelper.deleteItem('receipts', id).then((value) {
                   if (receipts.length == 1) {
                     Navigator.push(
@@ -108,6 +113,38 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> deleteFromFirebase(String itemID) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String userID = prefs.getString('uuid');
+
+    String urlget =
+        "https://receipt-49fc2.firebaseio.com/$userID/${widget.storeName}.json";
+    final responce = await http.get(urlget);
+    final data = json.decode(responce.body) as Map<String, dynamic>;
+    List<ReceiptModel> testModel = [];
+    data.forEach((key, value) {
+      testModel.add(ReceiptModel(
+        key: key,
+        price: value['price'],
+        date: value['date'],
+        itemID: value['id'],
+      ));
+    });
+    for (var i = 0; i < testModel.length; i++) {
+      if (testModel[i].itemID == itemID) {
+        String key = testModel[i].key;
+        String url =
+            "https://receipt-49fc2.firebaseio.com/$userID/${widget.storeName}/$key.json";
+        await http.delete(
+          url,
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8',
+          },
+        );
+      }
+    }
   }
 
   @override
@@ -164,7 +201,7 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
                     ),
                     child: InkWell(
                       onLongPress: () {
-                        _showDialog(receipts[i].id);
+                        _showDialog(receipts[i].id, receipts[i].itemID);
                       },
                       onTap: () {
                         //   openImage(receipts[i].image);
@@ -202,7 +239,6 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
                             ),
                           ),
                           Container(
-                           
                             width: double.infinity,
                             child: Column(
                               children: [
