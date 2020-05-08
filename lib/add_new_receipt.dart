@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -11,6 +12,8 @@ import 'models/receipt_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:uuid/uuid.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'package:gallery_saver/gallery_saver.dart';
 
 class AddNewReceipt extends StatefulWidget {
   @override
@@ -24,13 +27,17 @@ class _AddNewReceiptState extends State<AddNewReceipt> {
   TextEditingController controllerName = TextEditingController();
   TextEditingController controllerPrice = TextEditingController();
   _takePicture() async {
-    final imageFile = await ImagePicker.pickImage(
+    ImagePicker.pickImage(
       source: ImageSource.camera,
       maxWidth: 1200,
       preferredCameraDevice: CameraDevice.rear,
-    );
-    setState(() {
-      imageStored = imageFile;
+    ).then((value) {
+      if (value != null && value.path != null) {
+        GallerySaver.saveImage(value.path, albumName: "فواتيري");
+        setState(() {
+          imageStored = value;
+        });
+      }
     });
   }
 
@@ -145,7 +152,6 @@ class _AddNewReceiptState extends State<AddNewReceipt> {
                                     width:
                                         MediaQuery.of(context).size.width / 3,
                                     child: SimpleAutoCompleteTextField(
-                                       
                                       key: key,
                                       controller: controllerName,
                                       suggestions: stores,

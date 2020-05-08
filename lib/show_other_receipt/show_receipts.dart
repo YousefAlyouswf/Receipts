@@ -70,7 +70,13 @@ class _ShowReceiptsState extends State<ShowReceipts> {
   void initState() {
     super.initState();
     fetch();
-    colorList = [
+    colorList = [ Color(0xFFF7DC6F),
+      Color(0xFFA2D9CE),
+      Color(0xFFEDBB99),
+      Color(0xFFcddaab),
+      Color(0xFF7cae0f),
+      Color(0xFF2e84d5),
+      Color(0xFFe88b4b),
       Color(0xFF0B84A5),
       Color(0xFFF6C85F),
       Color(0xFF6F4E7C),
@@ -78,13 +84,7 @@ class _ShowReceiptsState extends State<ShowReceipts> {
       Color(0xFFCA472F),
       Color(0xFFFFA056),
       Color(0xFF8DDDD0),
-      Color(0xFFF7DC6F),
-      Color(0xFFA2D9CE),
-      Color(0xFFEDBB99),
-      Color(0xFFcddaab),
-      Color(0xFF7cae0f),
-      Color(0xFF2e84d5),
-      Color(0xFFe88b4b),
+     
     ];
   }
 

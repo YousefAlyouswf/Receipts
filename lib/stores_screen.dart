@@ -157,6 +157,7 @@ class _StoresScreenState extends State<StoresScreen> {
                           builder: (context) => ShowReceipts(
                             textCode: codeText.text,
                             name: friendName.text,
+                            saved: false,
                           ),
                         ),
                       );

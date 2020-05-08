@@ -1,7 +1,12 @@
 import 'dart:io';
-
+import 'dart:async';
+import 'dart:typed_data';
+import 'package:dio/dio.dart';
+import 'package:flutter/services.dart';
+import 'package:image_downloader/image_downloader.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:photo_view/photo_view.dart';
 import 'dart:convert';
 
@@ -92,7 +97,11 @@ class _OtherReceiptState extends State<OtherReceipt> {
                     ),
                   ),
                   child: InkWell(
-                    onLongPress: () {},
+                    onLongPress: () async {
+              
+
+                      _save(receipts[i].onlineImage);
+                    },
                     onTap: () {
                       //   openImage(receipts[i].image);
                       Navigator.of(context).push(
@@ -150,5 +159,13 @@ class _OtherReceiptState extends State<OtherReceipt> {
         ],
       ),
     );
+  }
+
+  _save(String image) async {
+    var response = await Dio()
+        .get(image, options: Options(responseType: ResponseType.bytes));
+    final result =
+        await ImageGallerySaver.saveImage(Uint8List.fromList(response.data));
+    print(result);
   }
 }
