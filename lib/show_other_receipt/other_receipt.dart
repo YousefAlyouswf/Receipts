@@ -1,9 +1,5 @@
-import 'dart:io';
-import 'dart:async';
 import 'dart:typed_data';
 import 'package:dio/dio.dart';
-import 'package:flutter/services.dart';
-import 'package:image_downloader/image_downloader.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_gallery_saver/image_gallery_saver.dart';

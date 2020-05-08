@@ -313,14 +313,14 @@ class _StoresScreenState extends State<StoresScreen> {
                           style: TextStyle(fontSize: 24, color: Colors.white),
                         ))
                       : Container(
-                          color: Colors.transparent,
+                          color: Colors.white54,
                           height: MediaQuery.of(context).size.height,
                           width: MediaQuery.of(context).size.width,
                           child: PieChart(
+                            chartLegendSpacing: 20,
                             dataMap: widget.dataMap,
                             colorList: colorList,
-                            showLegends: false,
-                            chartRadius: MediaQuery.of(context).size.width,
+                            showLegends: true,
                           ),
                         ),
                 );
