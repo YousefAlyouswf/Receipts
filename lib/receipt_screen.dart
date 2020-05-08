@@ -44,8 +44,6 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
     for (var i = 0; i < receipts.length; i++) {
       sumPrice += double.parse(receipts[i].price);
     }
-
-   
   }
 
   @override
@@ -100,16 +98,14 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
   void openImage(File image) {
     showModalBottomSheet(
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
+      isDismissible: true,
+      elevation: 0,
+      enableDrag: true,
+      barrierColor: Colors.white,
       context: context,
-      builder: (context) => Container(
-        color: Colors.red,
-        height: MediaQuery.of(context).size.height,
-        width: MediaQuery.of(context).size.width,
-        child: PhotoView(
-          imageProvider: FileImage(
-            image,
-          ),
+      builder: (context) => PhotoView(
+        imageProvider: FileImage(
+          image,
         ),
       ),
     );

@@ -54,8 +54,6 @@ class _StoresScreenState extends State<StoresScreen> {
 
     print(store);
 
-    
-
     store.forEach((element) {
       if (!map.containsKey(element)) {
         map[element] = 1;
@@ -219,113 +217,128 @@ class _StoresScreenState extends State<StoresScreen> {
         centerTitle: true,
       ),
       endDrawer: Drawer(
-        child: DrawerHeader(
-          child: ListView.builder(
-            itemCount: services.length,
-            itemBuilder: (ctx, i) {
-              return ListTile(
-                onTap: () async {
-                  if (i == 0) {
-                    _showDialog(i);
-                  } else if (i == 1) {
-                    _showDialog(i);
-                  } else if (i == 2) {
-                    List<Friends> frindes = [];
-                    final storeList = await DBHelper.getDataFriend('friend');
-                    setState(() {
-                      frindes = storeList
-                          .map(
-                            (item) => Friends(
-                              id: item['id'],
-                              name: item['name'],
-                              code: item['code'],
-                            ),
-                          )
-                          .toList();
-                    });
-                    showModalBottomSheet(
-                      backgroundColor: Colors.white,
-                      context: context,
-                      builder: (context) => frindes.length == 0
-                          ? Center(
-                              child: Text(
-                                "لا يوجد أصدقاء",
-                                style: TextStyle(
-                                    fontSize: 24, color: Colors.black),
-                              ),
-                            )
-                          : Container(
-                              color: Colors.white,
-                              height: MediaQuery.of(context).size.height,
-                              width: MediaQuery.of(context).size.width,
-                              child: ListView.builder(
-                                itemCount: frindes.length,
-                                itemBuilder: (ctx, index) {
-                                  return Padding(
-                                    padding: const EdgeInsets.all(32.0),
-                                    child: Card(
-                                      child: ListTile(
-                                        title: Text(
-                                          frindes[index].name,
-                                          textDirection: TextDirection.rtl,
-                                          style: TextStyle(
-                                            fontSize: 24,
-                                            color: Colors.black,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                        subtitle: Text(
-                                          frindes[index].code,
-                                          textDirection: TextDirection.rtl,
-                                          style: TextStyle(
-                                              color: Colors.grey, fontSize: 12),
-                                        ),
-                                        leading: IconButton(
-                                          icon: Icon(Icons.delete),
-                                          color: Colors.red,
-                                          onPressed: () async {
-                                            DBHelper.deleteFriend(
-                                              'friend',
-                                              frindes[index].id,
-                                            );
-                                          },
-                                        ),
-                                        onTap: () {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  ShowReceipts(
-                                                saved: true,
-                                                textCode: frindes[index].code,
-                                                name: frindes[index].name,
-                                              ),
-                                            ),
-                                          );
-                                        },
-                                      ),
+        child: Column(
+          children: [
+            UserAccountsDrawerHeader(
+              accountName: Text(""),
+              accountEmail: Text(""),
+             
+            ),
+            Expanded(
+              child: Container(
+                 color: Colors.green[800],
+                child: ListView.builder(
+                  itemCount: services.length,
+                  itemBuilder: (ctx, i) {
+                    return ListTile(
+                      onTap: () async {
+                        if (i == 0) {
+                          _showDialog(i);
+                        } else if (i == 1) {
+                          _showDialog(i);
+                        } else if (i == 2) {
+                          List<Friends> frindes = [];
+                          final storeList =
+                              await DBHelper.getDataFriend('friend');
+                          setState(() {
+                            frindes = storeList
+                                .map(
+                                  (item) => Friends(
+                                    id: item['id'],
+                                    name: item['name'],
+                                    code: item['code'],
+                                  ),
+                                )
+                                .toList();
+                          });
+                          showModalBottomSheet(
+                            backgroundColor: Colors.white,
+                            context: context,
+                            builder: (context) => frindes.length == 0
+                                ? Center(
+                                    child: Text(
+                                      "لا يوجد أصدقاء",
+                                      style: TextStyle(
+                                          fontSize: 24, color: Colors.black),
                                     ),
-                                  );
-                                },
-                              ),
-                            ),
+                                  )
+                                : Container(
+                                    color: Colors.white,
+                                    height: MediaQuery.of(context).size.height,
+                                    width: MediaQuery.of(context).size.width,
+                                    child: ListView.builder(
+                                      itemCount: frindes.length,
+                                      itemBuilder: (ctx, index) {
+                                        return Padding(
+                                          padding: const EdgeInsets.all(32.0),
+                                          child: Card(
+                                            child: ListTile(
+                                              title: Text(
+                                                frindes[index].name,
+                                                textDirection: TextDirection.rtl,
+                                                style: TextStyle(
+                                                  fontSize: 24,
+                                                  color: Colors.black,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                              subtitle: Text(
+                                                frindes[index].code,
+                                                textDirection: TextDirection.rtl,
+                                                style: TextStyle(
+                                                    color: Colors.grey,
+                                                    fontSize: 12),
+                                              ),
+                                              leading: IconButton(
+                                                icon: Icon(Icons.delete),
+                                                color: Colors.red,
+                                                onPressed: () async {
+                                                  DBHelper.deleteFriend(
+                                                    'friend',
+                                                    frindes[index].id,
+                                                  );
+                                                },
+                                              ),
+                                              onTap: () {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        ShowReceipts(
+                                                      saved: true,
+                                                      textCode:
+                                                          frindes[index].code,
+                                                      name: frindes[index].name,
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                          );
+                        }
+                      },
+                      title: Card(
+                        color: Colors.white,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            services[i],
+                            textDirection: TextDirection.rtl,
+                            style: TextStyle(fontSize: 22),
+                          ),
+                        ),
+                      ),
                     );
-                  }
-                },
-                title: Card(
-                  color: Colors.white30,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      services[i],
-                      textDirection: TextDirection.rtl,
-                      style: TextStyle(fontSize: 22),
-                    ),
-                  ),
+                  },
                 ),
-              );
-            },
-          ),
+              ),
+            ),
+          ],
         ),
       ),
       floatingActionButton: Row(

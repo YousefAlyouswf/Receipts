@@ -11,10 +11,10 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       theme: ThemeData(
        
-        primarySwatch: Colors.blue,
-        secondaryHeaderColor: Colors.brown,
-       // cardColor: Color(0xFF008080),
-       // textSelectionColor: Colors.white
+        primaryColor: Colors.green[800],
+        floatingActionButtonTheme: FloatingActionButtonThemeData (backgroundColor: Colors.green),
+       
+      
       ),
       home: Loaded(),
     );

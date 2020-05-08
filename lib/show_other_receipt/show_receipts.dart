@@ -71,13 +71,13 @@ List<String> store = [];
       }
     } catch (e) {
       Fluttertoast.showToast(
-          msg: "خطأ في إدخال الكود",
+          msg: "المحفظة فارغة",
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.BOTTOM,
           timeInSecForIosWeb: 1,
-          backgroundColor: Colors.red,
-          textColor: Colors.white,
-          fontSize: 16.0);
+          backgroundColor: Colors.black12,
+          textColor: Colors.red,
+          fontSize: 24.0);
       Navigator.of(context).pop();
     }
   }
