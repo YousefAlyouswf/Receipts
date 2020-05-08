@@ -381,9 +381,16 @@ class _StoresScreenState extends State<StoresScreen> {
                     itemBuilder: (context, i) {
                       return Container(
                         decoration: new BoxDecoration(
-                            color: colorList[i],
-                            borderRadius:
-                                new BorderRadius.all(Radius.circular(5))),
+                          borderRadius:
+                              new BorderRadius.all(Radius.circular(15)),
+                          image: DecorationImage(
+                              colorFilter: ColorFilter.mode(
+                                  colorList[i], BlendMode.srcATop),
+                              image: NetworkImage(
+                                'https://image.flaticon.com/icons/png/512/83/83203.png',
+                              ),
+                              fit: BoxFit.fitHeight),
+                        ),
                         margin: EdgeInsets.all(10),
                         child: InkWell(
                           onTap: () {
@@ -396,13 +403,22 @@ class _StoresScreenState extends State<StoresScreen> {
                               ),
                             );
                           },
-                          child: Center(
-                            child: Text(
-                              stores[i].store,
-                              style: TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 18),
+                          child: Align(
+                            alignment: Alignment(0, -0.25),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: FittedBox(
+                                fit: BoxFit.contain,
+                                child: Text(
+                                  stores[i].store,
+                                  textDirection: TextDirection.rtl,
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18),
+                                ),
+                              ),
                             ),
                           ),
                         ),
