@@ -391,104 +391,106 @@ class _StoresScreenState extends State<StoresScreen> {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          widget.dataMap.isEmpty
-              ? Padding(
-                  padding: const EdgeInsets.only(top: 32.0),
-                  child: InkWell(
-                    onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => AddNewReceipt()));
-                    },
-                    child: Center(
-                      child: Container(
-                        height: MediaQuery.of(context).size.height / 4,
-                        width: MediaQuery.of(context).size.width / 2,
-                        child: LiquidCircularProgressIndicator(
-                          value: 0.25, // Defaults to 0.5.
-                          valueColor: AlwaysStoppedAnimation(Colors.red),
-                          backgroundColor: Colors.white,
-                          borderColor: Colors.red,
-                          borderWidth: 5.0,
-                          direction: Axis.horizontal,
-                          center: Text(
-                            "إظافة فاتورة جديدة",
-                            textDirection: TextDirection.rtl,
+      body: Container(
+        color: Colors.green[50],
+        child: Column(
+          children: [
+            widget.dataMap.isEmpty
+                ? Padding(
+                    padding: const EdgeInsets.only(top: 32.0),
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => AddNewReceipt()));
+                      },
+                      child: Center(
+                        child: Container(
+                          height: MediaQuery.of(context).size.height / 4,
+                          width: MediaQuery.of(context).size.width / 2,
+                          child: LiquidCircularProgressIndicator(
+                            value: 0.25, // Defaults to 0.5.
+                            valueColor: AlwaysStoppedAnimation(Colors.red),
+                            backgroundColor: Colors.white,
+                            borderColor: Colors.red,
+                            borderWidth: 5.0,
+                            direction: Axis.horizontal,
+                            center: Text(
+                              "إظافة فاتورة جديدة",
+                              textDirection: TextDirection.rtl,
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                )
-              : Expanded(
-                  child: GridView.builder(
-                    itemCount: stores.length,
-                    gridDelegate: new SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 3),
-                    itemBuilder: (context, i) {
-                      return Container(
-                        decoration: new BoxDecoration(
-                          borderRadius:
-                              new BorderRadius.all(Radius.circular(15)),
-                          image: DecorationImage(
-                              colorFilter: ColorFilter.mode(
-                                  colorList[i], BlendMode.srcATop),
-                              image: AssetImage(
-                                'assets/images/wallet.png',
-                              ),
-                              fit: BoxFit.fitHeight),
-                        ),
-                        margin: EdgeInsets.all(10),
-                        child: InkWell(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => ReceiptScreen(
-                                  storeName: stores[i].store,
+                  )
+                : Expanded(
+                    child: GridView.builder(
+                      itemCount: stores.length,
+                      gridDelegate: new SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2),
+                      itemBuilder: (context, i) {
+                        return Container(
+                          decoration: new BoxDecoration(
+                            borderRadius:
+                                new BorderRadius.all(Radius.circular(15)),
+                            image: DecorationImage(
+                                colorFilter: ColorFilter.mode(
+                                    colorList[i], BlendMode.srcATop),
+                                image: AssetImage(
+                                  'assets/images/wallet.png',
                                 ),
-                              ),
-                            );
-                          },
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              SizedBox(
-                                height: 20,
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: FittedBox(
-                                  fit: BoxFit.contain,
-                                  child: Text(
-                                    stores[i].store,
-                                    textDirection: TextDirection.rtl,
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                        color: Colors.black,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 18),
+                                fit: BoxFit.fitHeight),
+                          ),
+                          margin: EdgeInsets.all(10),
+                          child: InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ReceiptScreen(
+                                    storeName: stores[i].store,
                                   ),
                                 ),
-                              ),
-                              SizedBox(
-                                height: 15,
-                              ),
-                              Text(
-                                "الفواتير ${map[stores[i].store].toString()}",
-                                textDirection: TextDirection.rtl,
-                              )
-                            ],
+                              );
+                            },
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                SizedBox(
+                                  height: 20,
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: FittedBox(
+                                    fit: BoxFit.contain,
+                                    child: Text(
+                                      stores[i].store,
+                                      textDirection: TextDirection.rtl,
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 18),
+                                    ),
+                                  ),
+                                ),
+                               
+                                Text(
+                                  "الفواتير ${map[stores[i].store].toString()}",
+                                  textDirection: TextDirection.rtl,
+                                )
+                              ],
+                            ),
                           ),
-                        ),
-                      );
-                    },
+                        );
+                      },
+                    ),
                   ),
-                ),
-        ],
+          ],
+        ),
       ),
     );
   }

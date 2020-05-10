@@ -184,121 +184,159 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
           ),
           centerTitle: true,
         ),
-        body: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(
-                  top: 16.0, bottom: 16.0, left: 32, right: 32),
-              child: Container(
-                width: double.infinity,
-                //height: MediaQuery.of(context).size.height * 0.05,
-                child: Card(
-                  elevation: 10,
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      Center(
-                        child: Text(
-                          _datePicked == null
-                              ? 'لم يتم أختيار التاريخ'
-                              : '$_datePicked',
-                          textDirection: TextDirection.rtl,
+        body: Container(
+          color: Colors.green[50],
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(
+                    top: 16.0, bottom: 16.0, left: 32, right: 32),
+                child: Container(
+                  width: double.infinity,
+                  //height: MediaQuery.of(context).size.height * 0.05,
+                  child: Card(
+                    elevation: 10,
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        Center(
+                          child: Text(
+                            _datePicked == null
+                                ? 'لم يتم أختيار التاريخ'
+                                : '$_datePicked',
+                            textDirection: TextDirection.rtl,
+                          ),
                         ),
-                      ),
-                     _datePicked == null?Text(''): IconButton(
-                        icon: Icon(Icons.cancel, color: Colors.red,),
-                        onPressed: () {
-                          setState(() {
-                            _datePicked = null;
-                          });
-                        },
-                      ),
-                      FlatButton.icon(
-                        onPressed: _presentDatePicker,
-                        icon: Icon(Icons.calendar_today),
-                        label: Text('التاريخ'),
-                      ),
-                    ],
+                        _datePicked == null
+                            ? Text('')
+                            : IconButton(
+                                icon: Icon(
+                                  Icons.cancel,
+                                  color: Colors.red,
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    _datePicked = null;
+                                  });
+                                },
+                              ),
+                        FlatButton.icon(
+                          onPressed: _presentDatePicker,
+                          icon: Icon(Icons.calendar_today),
+                          label: Text('التاريخ'),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-            Expanded(
-              child: GridView.builder(
-                physics: ClampingScrollPhysics(),
-                shrinkWrap: true,
-                itemCount: receipts.length,
-                gridDelegate: new SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2),
-                itemBuilder: (context, i) {
-                  return Container(
-                    margin: EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: Colors.grey,
-                        width: 1,
+              Expanded(
+                child: GridView.builder(
+                  physics: ClampingScrollPhysics(),
+                  shrinkWrap: true,
+                  itemCount: receipts.length,
+                  gridDelegate: new SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2),
+                  itemBuilder: (context, i) {
+                    return Container(
+                      margin: EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: Colors.grey,
+                          width: 1,
+                        ),
                       ),
-                    ),
-                    child: InkWell(
-                      onLongPress: () {
-                        _showDialog(receipts[i].id, receipts[i].itemID);
-                      },
-                      onTap: () {
-                        //   openImage(receipts[i].image);
-                        Navigator.of(context).push(
-                          new MaterialPageRoute<Null>(
-                            builder: (BuildContext context) {
-                              return Container(
-                                color: Colors.transparent,
-                                child: Dialog(
-                                  child: Container(
-                                    height: MediaQuery.of(context).size.height,
-                                    width: MediaQuery.of(context).size.width,
-                                    child: PhotoView(
-                                      imageProvider: FileImage(
-                                        receipts[i].image,
+                      child: InkWell(
+                        onLongPress: () {
+                          _showDialog(receipts[i].id, receipts[i].itemID);
+                        },
+                        onTap: () {
+                          //   openImage(receipts[i].image);
+                          Navigator.of(context).push(
+                            new MaterialPageRoute<Null>(
+                              builder: (BuildContext context) {
+                                return Container(
+                                  color: Colors.transparent,
+                                  child: Dialog(
+                                    child: Container(
+                                      height:
+                                          MediaQuery.of(context).size.height,
+                                      width: MediaQuery.of(context).size.width,
+                                      child: PhotoView(
+                                        imageProvider: FileImage(
+                                          receipts[i].image,
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
-                              );
-                            },
-                            fullscreenDialog: true,
-                          ),
-                        );
-                      },
-                      child: Column(
-                        children: <Widget>[
-                          Expanded(
-                            child: Container(
-                              child: Image.file(
-                                receipts[i].image,
-                                fit: BoxFit.fill,
-                                width: double.infinity,
-                              ),
+                                );
+                              },
+                              fullscreenDialog: true,
                             ),
-                          ),
-                          Container(
-                            width: double.infinity,
-                            child: Column(
-                              children: [
-                                Text(
-                                  " ${receipts[i].price} ريال",
-                                  textDirection: TextDirection.rtl,
+                          );
+                        },
+                        child: Stack(
+                          children: [
+                            Column(
+                              children: <Widget>[
+                                Expanded(
+                                  child: Container(
+                                    child: Image.file(
+                                      receipts[i].image,
+                                      fit: BoxFit.fill,
+                                      width: double.infinity,
+                                    ),
+                                  ),
                                 ),
-                                Text(receipts[i].date),
+                                Container(
+                                  width: double.infinity,
+                                  child: Column(
+                                    children: [
+                                      Text(
+                                        " ${receipts[i].price} ريال",
+                                        textDirection: TextDirection.rtl,
+                                      ),
+                                      Text(receipts[i].date),
+                                    ],
+                                  ),
+                                ),
                               ],
                             ),
-                          ),
-                        ],
+                            Align(
+                              alignment: Alignment.bottomLeft,
+                              child: IconButton(
+                                icon: Icon(
+                                  Icons.delete_forever,
+                                  color: Colors.red,
+                                ),
+                                onPressed: () {
+                                  _showDialog(
+                                      receipts[i].id, receipts[i].itemID);
+                                },
+                              ),
+                            ),
+                            Align(
+                              alignment: Alignment.bottomRight,
+                              child: IconButton(
+                                icon: Icon(
+                                  Icons.edit,
+                                  color: Colors.blue,
+                                ),
+                                onPressed: () {
+                                   
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  );
-                },
+                    );
+                  },
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
