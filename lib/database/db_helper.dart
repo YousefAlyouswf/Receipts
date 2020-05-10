@@ -50,6 +50,17 @@ class DBHelper {
     }
   }
 
+  static Future<void> updateData(
+      String table, Map<String, Object> data, String itemID) async {
+    final db = await DBHelper.database();
+    db.update(
+      table,
+      data,
+      where: 'key = ?',
+      whereArgs: [itemID],
+    );
+  }
+
   static Future<List<Map<String, dynamic>>> receiptCount(String table) async {
     final db = await DBHelper.database();
 

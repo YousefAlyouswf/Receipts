@@ -15,6 +15,16 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:gallery_saver/gallery_saver.dart';
 
 class AddNewReceipt extends StatefulWidget {
+  final String storeName;
+  final String price;
+  final String date;
+  final File image;
+  final String itemID;
+
+  const AddNewReceipt(
+      {Key key, this.storeName, this.price, this.image, this.date, this.itemID})
+      : super(key: key);
+
   @override
   _AddNewReceiptState createState() => _AddNewReceiptState();
 }
@@ -76,11 +86,22 @@ class _AddNewReceiptState extends State<AddNewReceipt> {
     }
   }
 
+  bool isEdited = false;
   @override
   void initState() {
     super.initState();
     fetchStore();
-    itemID = uuid.v1();
+
+    if (widget.storeName != null) {
+      _datePicked = widget.date;
+      imageStored = widget.image;
+      controllerName.text = widget.storeName;
+      controllerPrice.text = widget.price;
+      itemID = widget.itemID;
+      isEdited = true;
+    } else {
+      itemID = uuid.v1();
+    }
   }
 
   String _datePicked;
@@ -218,22 +239,36 @@ class _AddNewReceiptState extends State<AddNewReceipt> {
                                       fontSize: 16.0);
                                 } else {
                                   uploadImage();
-                                  getDate().then((date) async {
-                                    DBHelper.insert(
-                                      'receipts',
-                                      {
-                                        'store': controllerName.text,
-                                        'price': controllerPrice.text,
-                                        'image': imageStored.path,
-                                        'date': _datePicked == null
-                                            ? date
-                                            : _datePicked,
-                                        'key': itemID,
-                                      },
-                                    );
-                                  }).catchError((onError) {
-                                    print(onError);
-                                  });
+
+                                  if (isEdited) {
+                                    DBHelper.updateData(
+                                        'receipts',
+                                        {
+                                          'store': controllerName.text,
+                                          'price': controllerPrice.text,
+                                          'image': imageStored.path,
+                                          'date': _datePicked,
+                                          'key': itemID,
+                                        },
+                                        itemID);
+                                  } else {
+                                    getDate().then((date) async {
+                                      DBHelper.insert(
+                                        'receipts',
+                                        {
+                                          'store': controllerName.text,
+                                          'price': controllerPrice.text,
+                                          'image': imageStored.path,
+                                          'date': _datePicked == null
+                                              ? date
+                                              : _datePicked,
+                                          'key': itemID,
+                                        },
+                                      );
+                                    }).catchError((onError) {
+                                      print(onError);
+                                    });
+                                  }
 
                                   Navigator.push(
                                     context,

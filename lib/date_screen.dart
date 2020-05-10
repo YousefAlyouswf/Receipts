@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:receipt/database/db_helper.dart';
 import 'package:receipt/models/receipt_model.dart';
+import 'add_new_receipt.dart';
 import 'loaded.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:http/http.dart' as http;
@@ -324,7 +325,18 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
                                   color: Colors.blue,
                                 ),
                                 onPressed: () {
-                                   
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => AddNewReceipt(
+                                        storeName: receipts[i].store,
+                                        price: receipts[i].price,
+                                        date: receipts[i].date,
+                                        image: receipts[i].image,
+                                        itemID: receipts[i].itemID,
+                                      ),
+                                    ),
+                                  );
                                 },
                               ),
                             ),
