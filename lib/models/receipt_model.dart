@@ -9,7 +9,7 @@ class ReceiptModel {
   final File image;
   final String date;
   final String onlineImage;
-  final List<ReceiptModel> listModel;
+  final int dateTime;
   ReceiptModel({
     this.itemID,
     this.key,
@@ -18,7 +18,7 @@ class ReceiptModel {
     this.price,
     this.image,
     this.date,
-    this.listModel,
+    this.dateTime,
     this.onlineImage,
   });
 }

@@ -41,6 +41,7 @@ dependencies:
   image_gallery_saver: ^1.2.2
   dio: ^3.0.9
   gallery_saver: ^2.0.1
+  
   flutter_localizations:
     sdk: flutter
 

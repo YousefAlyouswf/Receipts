@@ -69,6 +69,8 @@ class _StoresScreenState extends State<StoresScreen> {
   @override
   void initState() {
     super.initState();
+  
+  
     fetchStore();
     countTheReceipts();
     colorList = [

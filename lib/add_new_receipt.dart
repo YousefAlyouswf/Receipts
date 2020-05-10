@@ -86,6 +86,12 @@ class _AddNewReceiptState extends State<AddNewReceipt> {
     }
   }
 
+  static int currentTimeInSeconds() {
+    var ms = (new DateTime.now()).millisecondsSinceEpoch;
+
+    return (ms / 1000).round();
+  }
+
   bool isEdited = false;
   @override
   void initState() {
@@ -105,6 +111,7 @@ class _AddNewReceiptState extends State<AddNewReceipt> {
   }
 
   String _datePicked;
+  int _dateTimePicked;
   void _presentDatePicker() {
     showDatePicker(
       context: context,
@@ -120,6 +127,8 @@ class _AddNewReceiptState extends State<AddNewReceipt> {
       } else {
         setState(() {
           _datePicked = "${date.day}/${date.month}/${date.year}";
+          _dateTimePicked = date.millisecondsSinceEpoch;
+          _dateTimePicked = (_dateTimePicked / 1000).round();
         });
       }
     });
@@ -249,9 +258,14 @@ class _AddNewReceiptState extends State<AddNewReceipt> {
                                           'image': imageStored.path,
                                           'date': _datePicked,
                                           'key': itemID,
+                                          'dateTime': _dateTimePicked == null
+                                              ? currentTimeInSeconds()
+                                              : _dateTimePicked,
                                         },
                                         itemID);
                                   } else {
+                                    currentTimeInSeconds();
+
                                     getDate().then((date) async {
                                       DBHelper.insert(
                                         'receipts',
@@ -263,6 +277,9 @@ class _AddNewReceiptState extends State<AddNewReceipt> {
                                               ? date
                                               : _datePicked,
                                           'key': itemID,
+                                          'dateTime': _dateTimePicked == null
+                                              ? currentTimeInSeconds()
+                                              : _dateTimePicked,
                                         },
                                       );
                                     }).catchError((onError) {

@@ -30,13 +30,13 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
       receipts = dataList
           .map(
             (item) => ReceiptModel(
-              id: item['id'],
-              store: item['store'],
-              price: item['price'],
-              image: File(item['image']),
-              date: item['date'],
-              itemID: item['key'],
-            ),
+                id: item['id'],
+                store: item['store'],
+                price: item['price'],
+                image: File(item['image']),
+                date: item['date'],
+                itemID: item['key'],
+                dateTime: item['dateTime']),
           )
           .toList();
     });

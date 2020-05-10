@@ -12,7 +12,7 @@ class DBHelper {
       ),
       onCreate: (db, version) {
         db.execute(
-            "CREATE TABLE receipts(id INTEGER PRIMARY KEY AUTOINCREMENT, store TEXT, price TEXT, image TEXT, date TEXT, key TEXT)");
+            "CREATE TABLE receipts(id INTEGER PRIMARY KEY AUTOINCREMENT, store TEXT, price TEXT, image TEXT, date TEXT, key TEXT, dateTime INTEGER DEFAULT (cast(strftime('%s','now') as int)))");
       },
       version: 1,
     );
@@ -23,7 +23,6 @@ class DBHelper {
     db.insert(
       table,
       data,
-      conflictAlgorithm: sqlite.ConflictAlgorithm.replace,
     );
   }
 
@@ -38,14 +37,14 @@ class DBHelper {
         table,
         where: 'store = ? and date = ?',
         whereArgs: [store, datePicked],
-        orderBy: 'date desc, id desc',
+        orderBy: 'dateTime desc, id desc',
       );
     } else {
       return db.query(
         table,
         where: 'store = ?',
         whereArgs: [store],
-        orderBy: 'date desc, id desc',
+        orderBy: 'dateTime desc, id desc',
       );
     }
   }
