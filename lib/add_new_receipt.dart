@@ -12,7 +12,6 @@ import 'models/receipt_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:uuid/uuid.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import 'package:gallery_saver/gallery_saver.dart';
 
 class AddNewReceipt extends StatefulWidget {
@@ -62,7 +61,7 @@ class _AddNewReceiptState extends State<AddNewReceipt> {
   List<ReceiptModel> storesModels = [];
   List<String> stores = [];
   Future<void> fetchStore() async {
-    final storeList = await DBHelper.getData('receipts', '');
+    final storeList = await DBHelper.getData('receipts', '', null);
     setState(() {
       storesModels = storeList
           .map(
@@ -82,6 +81,27 @@ class _AddNewReceiptState extends State<AddNewReceipt> {
     super.initState();
     fetchStore();
     itemID = uuid.v1();
+  }
+
+  String _datePicked;
+  void _presentDatePicker() {
+    showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2018),
+      lastDate: DateTime.now(),
+      cancelText: "إلغاء",
+      confirmText: "تم",
+      locale: Locale('ar', 'SA'),
+    ).then((date) {
+      if (date == null) {
+        return;
+      } else {
+        setState(() {
+          _datePicked = "${date.day}/${date.month}/${date.year}";
+        });
+      }
+    });
   }
 
   @override
@@ -166,6 +186,16 @@ class _AddNewReceiptState extends State<AddNewReceipt> {
                                 ),
                               ],
                             ),
+                            //------Here pick a date
+                            FlatButton.icon(
+                              onPressed: _presentDatePicker,
+                              icon: Icon(Icons.calendar_today),
+                              label: Text(
+                                _datePicked == null ? 'التاريخ' : _datePicked,
+                                textDirection: TextDirection.rtl,
+                              ),
+                            ),
+                            //-----------------
                             FlatButton(
                               onPressed: () async {
                                 if (controllerName.text.isEmpty) {
@@ -195,7 +225,9 @@ class _AddNewReceiptState extends State<AddNewReceipt> {
                                         'store': controllerName.text,
                                         'price': controllerPrice.text,
                                         'image': imageStored.path,
-                                        'date': date,
+                                        'date': _datePicked == null
+                                            ? date
+                                            : _datePicked,
                                         'key': itemID,
                                       },
                                     );
@@ -263,7 +295,7 @@ class _AddNewReceiptState extends State<AddNewReceipt> {
                 'store': controllerName.text,
                 'price': controllerPrice.text,
                 'image': urlImage,
-                'date': date,
+                'date': _datePicked == null ? date : _datePicked,
                 'id': itemID,
               },
             ),
@@ -279,7 +311,7 @@ class _AddNewReceiptState extends State<AddNewReceipt> {
                 'store': controllerName.text,
                 'price': controllerPrice.text,
                 'image': urlImage,
-                'date': date,
+                'date': _datePicked == null ? date : _datePicked,
                 'id': itemID,
               },
             ),

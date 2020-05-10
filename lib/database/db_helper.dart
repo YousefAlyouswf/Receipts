@@ -28,11 +28,18 @@ class DBHelper {
   }
 
   static Future<List<Map<String, dynamic>>> getData(
-      String table, String store) async {
+      String table, String store, String datePicked) async {
     final db = await DBHelper.database();
     if (store == '') {
       return db.query(table,
           distinct: true, columns: ['store'], orderBy: 'store');
+    } else if (datePicked != null) {
+      return db.query(
+        table,
+        where: 'store = ? and date = ?',
+        whereArgs: [store, datePicked],
+        orderBy: 'date desc, id desc',
+      );
     } else {
       return db.query(
         table,

@@ -4,7 +4,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:receipt/database/db_helper.dart';
 import 'package:receipt/models/friends_model.dart';
 import 'package:receipt/models/receipt_model.dart';
-import 'package:receipt/receipt_screen.dart';
+import 'package:receipt/date_screen.dart';
 import 'package:pie_chart/pie_chart.dart';
 import 'package:receipt/show_other_receipt/show_receipts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -23,7 +23,7 @@ class _StoresScreenState extends State<StoresScreen> {
   List<ReceiptModel> stores = [];
   var map = Map();
   Future<void> fetchStore() async {
-    final storeList = await DBHelper.getData('receipts', '');
+    final storeList = await DBHelper.getData('receipts', '', null);
     setState(() {
       stores = storeList
           .map(
@@ -206,8 +206,8 @@ class _StoresScreenState extends State<StoresScreen> {
 
   List<String> services = [
     'عرض الرقم',
-    'فواتير صديق جديد',
-    'فواتير أصدقاء مخزنة',
+    'إظافة صديق',
+    'قائمة الأصدقاء',
   ];
   @override
   Widget build(BuildContext context) {
@@ -218,15 +218,13 @@ class _StoresScreenState extends State<StoresScreen> {
       ),
       endDrawer: Drawer(
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            UserAccountsDrawerHeader(
-              accountName: Text(""),
-              accountEmail: Text(""),
-             
-            ),
+            //  Text('محفظتي تطبيق لحفظ فواتيرك ومشاركتها مع الاصدقاء'),
             Expanded(
-              child: Container(
-                 color: Colors.green[800],
+              child: Padding(
+                padding: const EdgeInsets.only(top: 32.0),
                 child: ListView.builder(
                   itemCount: services.length,
                   itemBuilder: (ctx, i) {
@@ -275,7 +273,8 @@ class _StoresScreenState extends State<StoresScreen> {
                                             child: ListTile(
                                               title: Text(
                                                 frindes[index].name,
-                                                textDirection: TextDirection.rtl,
+                                                textDirection:
+                                                    TextDirection.rtl,
                                                 style: TextStyle(
                                                   fontSize: 24,
                                                   color: Colors.black,
@@ -284,7 +283,8 @@ class _StoresScreenState extends State<StoresScreen> {
                                               ),
                                               subtitle: Text(
                                                 frindes[index].code,
-                                                textDirection: TextDirection.rtl,
+                                                textDirection:
+                                                    TextDirection.rtl,
                                                 style: TextStyle(
                                                     color: Colors.grey,
                                                     fontSize: 12),
@@ -322,16 +322,19 @@ class _StoresScreenState extends State<StoresScreen> {
                           );
                         }
                       },
-                      title: Card(
-                        color: Colors.white,
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            services[i],
-                            textDirection: TextDirection.rtl,
-                            style: TextStyle(fontSize: 22),
+                      title: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              services[i],
+                              textDirection: TextDirection.rtl,
+                              style: TextStyle(fontSize: 22),
+                            ),
                           ),
-                        ),
+                          Icon(i==0?Icons.swap_horiz:i==1?Icons.add:Icons.list),
+                        ],
                       ),
                     );
                   },

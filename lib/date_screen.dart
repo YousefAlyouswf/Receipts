@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart';
 import 'package:receipt/database/db_helper.dart';
 import 'package:receipt/models/receipt_model.dart';
 import 'loaded.dart';
@@ -24,7 +23,8 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
   var dateSort = [];
   double sumPrice = 0;
   Future<void> fetchReceipts() async {
-    final dataList = await DBHelper.getData('receipts', widget.storeName);
+    final dataList =
+        await DBHelper.getData('receipts', widget.storeName, _datePicked);
     setState(() {
       receipts = dataList
           .map(
@@ -143,6 +143,27 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
     }
   }
 
+  String _datePicked;
+  void _presentDatePicker() {
+    showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2018),
+      lastDate: DateTime.now(),
+      cancelText: "إلغاء",
+      confirmText: "تم",
+      locale: Locale('ar', 'SA'),
+    ).then((date) {
+      if (date == null) {
+        return;
+      } else {
+        setState(() {
+          _datePicked = "${date.day}/${date.month}/${date.year}";
+        });
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     fetchReceipts();
@@ -157,7 +178,10 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: Text(widget.storeName),
+          title: Text(
+            "${widget.storeName} ($sumPrice ريال) ",
+            textDirection: TextDirection.rtl,
+          ),
           centerTitle: true,
         ),
         body: Column(
@@ -170,12 +194,33 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
                 //height: MediaQuery.of(context).size.height * 0.05,
                 child: Card(
                   elevation: 10,
-                  child: Center(
-                      child: Text(
-                    '$sumPrice ريال ',
-                    textDirection: TextDirection.rtl,
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                  )),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Center(
+                        child: Text(
+                          _datePicked == null
+                              ? 'لم يتم أختيار التاريخ'
+                              : '$_datePicked',
+                          textDirection: TextDirection.rtl,
+                        ),
+                      ),
+                     _datePicked == null?Text(''): IconButton(
+                        icon: Icon(Icons.cancel, color: Colors.red,),
+                        onPressed: () {
+                          setState(() {
+                            _datePicked = null;
+                          });
+                        },
+                      ),
+                      FlatButton.icon(
+                        onPressed: _presentDatePicker,
+                        icon: Icon(Icons.calendar_today),
+                        label: Text('التاريخ'),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
