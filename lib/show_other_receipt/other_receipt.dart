@@ -28,12 +28,23 @@ class _OtherReceiptState extends State<OtherReceipt> {
     final data = json.decode(responce.body) as Map<String, dynamic>;
     List<ReceiptModel> testModel = [];
     data.forEach((key, value) {
-      testModel.add(ReceiptModel(
-        store: key,
-        price: value['price'],
-        date: value['date'],
-        onlineImage: value['image'],
-      ));
+      if (_datePicked == null) {
+        testModel.add(ReceiptModel(
+          store: key,
+          price: value['price'],
+          date: value['date'],
+          onlineImage: value['image'],
+        ));
+      } else {
+        if (value['date'] == _datePicked) {
+          testModel.add(ReceiptModel(
+            store: key,
+            price: value['price'],
+            date: value['date'],
+            onlineImage: value['image'],
+          ));
+        }
+      }
     });
     setState(() {
       receipts = testModel;
@@ -76,7 +87,9 @@ class _OtherReceiptState extends State<OtherReceipt> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("${widget.storeName} ($sumPrice ريال) ",),
+        title: Text(
+          "${widget.storeName} ($sumPrice ريال) ",
+        ),
         centerTitle: true,
       ),
       body: Column(
