@@ -69,8 +69,7 @@ class _StoresScreenState extends State<StoresScreen> {
   @override
   void initState() {
     super.initState();
-  
-  
+
     fetchStore();
     countTheReceipts();
     colorList = [
@@ -210,10 +209,12 @@ class _StoresScreenState extends State<StoresScreen> {
     'عرض الرقم',
     'إظافة صديق',
     'قائمة الأصدقاء',
+    'شرح إستخدام التطبيق',
   ];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomPadding: false,
       appBar: AppBar(
         title: Text("محفظتي"),
         centerTitle: true,
@@ -237,6 +238,7 @@ class _StoresScreenState extends State<StoresScreen> {
                         } else if (i == 1) {
                           _showDialog(i);
                         } else if (i == 2) {
+                          Navigator.of(context).pop();
                           List<Friends> frindes = [];
                           final storeList =
                               await DBHelper.getDataFriend('friend');
@@ -322,11 +324,69 @@ class _StoresScreenState extends State<StoresScreen> {
                                     ),
                                   ),
                           );
+                        } else if (i == 3) {
+                          TextStyle style = TextStyle(fontSize: 18);
+                          showModalBottomSheet(
+                              backgroundColor: Colors.white,
+                              context: context,
+                              builder: (context) => SingleChildScrollView(
+                                    child: Container(
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(32.0),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.end,
+                                          children: [
+                                            Center(
+                                              child: Text(
+                                                'تطبيق محفظتي',
+                                                textDirection:
+                                                    TextDirection.rtl,
+                                                style: style,
+                                              ),
+                                            ),
+                                            Text(
+                                              'يحفظ لك جميع فواتيرك ومشترياتك عن طريق تصوير الفاتورة وادخال اسم المتجر والسعر الاجمالي للفاتورة',
+                                              textDirection: TextDirection.rtl,
+                                              style: style,
+                                            ),
+                                            Text(
+                                              'يسمح لك التطبيق بمشاركة فواتيرك و مشترياتك مع الاصدقاء والأهل',
+                                              textDirection: TextDirection.rtl,
+                                              style: style,
+                                            ),
+                                            Center(
+                                              child: Text(
+                                                'القائمة الجانبية',
+                                                textDirection: TextDirection.rtl,
+                                                style: style,
+                                              ),
+                                            ),
+                                            Text(
+                                              'عرض رقمك الخاص الذي يسمح لأصدقائك بالاطلاع على فواتيرك',
+                                              textDirection: TextDirection.rtl,
+                                              style: style,
+                                            ),
+                                            Text(
+                                              'إظافة صديق عن طريق رقمه الظاهر في تطبيقه الخاص لإظافته في قائمتك والإطلاع على فواتيره بشكل مستمر',
+                                              textDirection: TextDirection.rtl,
+                                              style: style,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ));
                         }
                       },
                       title: Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
+                          i == 3
+                              ? SizedBox(
+                                  height: MediaQuery.of(context).size.height,
+                                )
+                              : Container(),
                           Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Text(
@@ -335,7 +395,15 @@ class _StoresScreenState extends State<StoresScreen> {
                               style: TextStyle(fontSize: 22),
                             ),
                           ),
-                          Icon(i==0?Icons.swap_horiz:i==1?Icons.add:Icons.list),
+                          Icon(
+                            i == 0
+                                ? Icons.swap_horiz
+                                : i == 1
+                                    ? Icons.add
+                                    : i == 2
+                                        ? Icons.list
+                                        : Icons.tablet_android,
+                          ),
                         ],
                       ),
                     );
@@ -430,8 +498,9 @@ class _StoresScreenState extends State<StoresScreen> {
                 : Expanded(
                     child: GridView.builder(
                       itemCount: stores.length,
-                      gridDelegate: new SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2),
+                      gridDelegate:
+                          new SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2),
                       itemBuilder: (context, i) {
                         return Container(
                           decoration: new BoxDecoration(
@@ -448,7 +517,6 @@ class _StoresScreenState extends State<StoresScreen> {
                           margin: EdgeInsets.all(10),
                           child: InkWell(
                             onTap: () {
-                          
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -480,7 +548,6 @@ class _StoresScreenState extends State<StoresScreen> {
                                     ),
                                   ),
                                 ),
-                               
                                 Text(
                                   "الفواتير ${map[stores[i].store].toString()}",
                                   textDirection: TextDirection.rtl,

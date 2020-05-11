@@ -60,7 +60,9 @@ class _LoadedState extends State<Loaded> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     if (prefs.getString('uuid') == null) {
       var uuid = Uuid();
-      prefs.setString('uuid', uuid.v1());
+      String uid = uuid.v1();
+
+      prefs.setString('uuid', uid.substring(0, 8));
     }
   }
 

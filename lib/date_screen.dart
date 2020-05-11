@@ -372,7 +372,6 @@ class _GridItemState extends State<GridItem> {
                 color: Colors.blue,
               ),
               onPressed: () {
-      
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -391,12 +390,17 @@ class _GridItemState extends State<GridItem> {
           isSelected
               ? Align(
                   alignment: Alignment.bottomRight,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Icon(
+                  child: IconButton(
+                    icon: Icon(
                       Icons.check_circle,
-                      color: Colors.red,
                     ),
+                    color: Colors.red,
+                    onPressed: () {
+                      setState(() {
+                        isSelected = !isSelected;
+                        widget.isSelected(isSelected);
+                      });
+                    },
                   ),
                 )
               : Container()
