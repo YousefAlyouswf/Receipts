@@ -10,6 +10,7 @@ class ReceiptModel {
   final String date;
   final String onlineImage;
   final int dateTime;
+  final int selectID;
   ReceiptModel({
     this.itemID,
     this.key,
@@ -20,5 +21,6 @@ class ReceiptModel {
     this.date,
     this.dateTime,
     this.onlineImage,
+    this.selectID,
   });
 }

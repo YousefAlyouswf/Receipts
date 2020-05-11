@@ -98,13 +98,15 @@ class _AddNewReceiptState extends State<AddNewReceipt> {
     super.initState();
     fetchStore();
 
-    if (widget.storeName != null) {
+    if (widget.itemID != null) {
       _datePicked = widget.date;
       imageStored = widget.image;
       controllerName.text = widget.storeName;
       controllerPrice.text = widget.price;
       itemID = widget.itemID;
       isEdited = true;
+    } else if (widget.storeName != null) {
+      controllerName.text = widget.storeName;
     } else {
       itemID = uuid.v1();
     }
@@ -137,6 +139,7 @@ class _AddNewReceiptState extends State<AddNewReceipt> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomPadding: false,
       appBar: AppBar(
         title: Text("أدخل الفاتورة"),
         centerTitle: true,
@@ -303,14 +306,32 @@ class _AddNewReceiptState extends State<AddNewReceipt> {
                                       fontSize: 16.0);
                                 }
                               },
-                              child: Text('تخزين'),
+                              child: Container(
+                                decoration: new BoxDecoration(
+                                  color: Colors.green[800],
+                                  borderRadius:
+                                      new BorderRadius.all(Radius.circular(10)),
+                                ),
+                                width: MediaQuery.of(context).size.width / 2,
+                                height:
+                                    MediaQuery.of(context).size.height * 0.07,
+                                child: Center(
+                                  child: Text(
+                                    'تخزين',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 24,
+                                    ),
+                                  ),
+                                ),
+                              ),
                             ),
                           ],
                         ),
                       )
                     : Center(
                         child: Text(
-                          "أختر صورة الفاتورة",
+                          "أدخل صورة الفاتورة",
                           style: TextStyle(fontSize: 25),
                         ),
                       ),

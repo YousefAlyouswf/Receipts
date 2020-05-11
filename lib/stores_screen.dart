@@ -448,6 +448,7 @@ class _StoresScreenState extends State<StoresScreen> {
                           margin: EdgeInsets.all(10),
                           child: InkWell(
                             onTap: () {
+                          
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(

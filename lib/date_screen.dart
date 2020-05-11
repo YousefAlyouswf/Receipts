@@ -20,8 +20,6 @@ class ReceiptScreen extends StatefulWidget {
 
 class _ReceiptScreenState extends State<ReceiptScreen> {
   List<ReceiptModel> receipts = [];
-  List<String> dateList = [];
-  var dateSort = [];
   double sumPrice = 0;
   Future<void> fetchReceipts() async {
     final dataList =
@@ -30,13 +28,14 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
       receipts = dataList
           .map(
             (item) => ReceiptModel(
-                id: item['id'],
-                store: item['store'],
-                price: item['price'],
-                image: File(item['image']),
-                date: item['date'],
-                itemID: item['key'],
-                dateTime: item['dateTime']),
+              id: item['id'],
+              store: item['store'],
+              price: item['price'],
+              image: File(item['image']),
+              date: item['date'],
+              itemID: item['key'],
+              dateTime: item['dateTime'],
+            ),
           )
           .toList();
     });
@@ -45,55 +44,7 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
     for (var i = 0; i < receipts.length; i++) {
       sumPrice += double.parse(receipts[i].price);
     }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    fetchReceipts();
-  }
-
-  void _showDialog(int id, String idFirebase) {
-    // flutter defined function
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        // return object of type Dialog
-        return AlertDialog(
-          title: new Text(
-            "تأكيد الحذف",
-            textDirection: TextDirection.rtl,
-          ),
-          actions: <Widget>[
-            // usually buttons at the bottom of the dialog
-
-            new FlatButton(
-              child: new Text("إلغاء"),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            new FlatButton(
-              child: new Text("حذف"),
-              onPressed: () {
-                deleteFromFirebase(idFirebase);
-                DBHelper.deleteItem('receipts', id).then((value) {
-                  if (receipts.length == 1) {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => Loaded(),
-                      ),
-                    );
-                  }
-                });
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
+    loadList();
   }
 
   void openImage(File image) {
@@ -161,13 +112,51 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
         setState(() {
           _datePicked = "${date.day}/${date.month}/${date.year}";
         });
+        fetchReceipts();
       }
     });
   }
 
+  List<ReceiptModel> itemList = [];
+  List<ReceiptModel> selectedList = [];
+  bool isSelected = false;
+  loadList() {
+    itemList = List();
+    selectedList = List();
+
+    List.generate(receipts.length, (index) {
+      itemList.add(
+        ReceiptModel(
+          store: receipts[index].store,
+          image: receipts[index].image,
+          price: receipts[index].price,
+          date: receipts[index].date,
+          itemID: receipts[index].itemID,
+          id: receipts[index].id,
+          selectID: index + 1,
+        ),
+      );
+    });
+  }
+
+  getSnackBar() {
+    if (selectedList.length > 0) {
+      _scaffoldKey.currentState.showSnackBar(SnackBar(
+        content: Text('Assign a GlobalKey to the Scaffold'),
+        duration: Duration(days: 365),
+      ));
+    } else {}
+  }
+
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+  @override
+  void initState() {
+    super.initState();
+    fetchReceipts();
+  }
+
   @override
   Widget build(BuildContext context) {
-    fetchReceipts();
     return WillPopScope(
       onWillPop: () async {
         return Navigator.push(
@@ -178,6 +167,20 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
         );
       },
       child: Scaffold(
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => AddNewReceipt(
+                  storeName: widget.storeName,
+                ),
+              ),
+            );
+          },
+          child: Icon(Icons.add),
+        ),
+        key: _scaffoldKey,
         appBar: AppBar(
           title: Text(
             "${widget.storeName} ($sumPrice ريال) ",
@@ -201,16 +204,8 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        Center(
-                          child: Text(
-                            _datePicked == null
-                                ? 'لم يتم أختيار التاريخ'
-                                : '$_datePicked',
-                            textDirection: TextDirection.rtl,
-                          ),
-                        ),
                         _datePicked == null
-                            ? Text('')
+                            ? Container()
                             : IconButton(
                                 icon: Icon(
                                   Icons.cancel,
@@ -220,8 +215,17 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
                                   setState(() {
                                     _datePicked = null;
                                   });
+                                  fetchReceipts();
                                 },
                               ),
+                        Center(
+                          child: Text(
+                            _datePicked == null
+                                ? 'لم يتم أختيار التاريخ'
+                                : '$_datePicked',
+                            textDirection: TextDirection.rtl,
+                          ),
+                        ),
                         FlatButton.icon(
                           onPressed: _presentDatePicker,
                           icon: Icon(Icons.calendar_today),
@@ -236,9 +240,10 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
                 child: GridView.builder(
                   physics: ClampingScrollPhysics(),
                   shrinkWrap: true,
-                  itemCount: receipts.length,
+                  itemCount: itemList.length,
                   gridDelegate: new SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2),
+                    crossAxisCount: 2,
+                  ),
                   itemBuilder: (context, i) {
                     return Container(
                       margin: EdgeInsets.all(10),
@@ -248,108 +253,154 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
                           width: 1,
                         ),
                       ),
-                      child: InkWell(
-                        onLongPress: () {
-                          _showDialog(receipts[i].id, receipts[i].itemID);
+                      child: GridItem(
+                        openImage: openImage,
+                        item: itemList[i],
+                        isSelected: (bool value) {
+                          setState(() {
+                            if (value) {
+                              selectedList.add(itemList[i]);
+                            } else {
+                              selectedList.remove(itemList[i]);
+                            }
+                          });
                         },
-                        onTap: () {
-                          //   openImage(receipts[i].image);
-                          Navigator.of(context).push(
-                            new MaterialPageRoute<Null>(
-                              builder: (BuildContext context) {
-                                return Container(
-                                  color: Colors.transparent,
-                                  child: Dialog(
-                                    child: Container(
-                                      height:
-                                          MediaQuery.of(context).size.height,
-                                      width: MediaQuery.of(context).size.width,
-                                      child: PhotoView(
-                                        imageProvider: FileImage(
-                                          receipts[i].image,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              },
-                              fullscreenDialog: true,
-                            ),
-                          );
-                        },
-                        child: Stack(
-                          children: [
-                            Column(
-                              children: <Widget>[
-                                Expanded(
-                                  child: Container(
-                                    child: Image.file(
-                                      receipts[i].image,
-                                      fit: BoxFit.fill,
-                                      width: double.infinity,
-                                    ),
-                                  ),
-                                ),
-                                Container(
-                                  width: double.infinity,
-                                  child: Column(
-                                    children: [
-                                      Text(
-                                        " ${receipts[i].price} ريال",
-                                        textDirection: TextDirection.rtl,
-                                      ),
-                                      Text(receipts[i].date),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Align(
-                              alignment: Alignment.bottomLeft,
-                              child: IconButton(
-                                icon: Icon(
-                                  Icons.delete_forever,
-                                  color: Colors.red,
-                                ),
-                                onPressed: () {
-                                  _showDialog(
-                                      receipts[i].id, receipts[i].itemID);
-                                },
-                              ),
-                            ),
-                            Align(
-                              alignment: Alignment.bottomRight,
-                              child: IconButton(
-                                icon: Icon(
-                                  Icons.edit,
-                                  color: Colors.blue,
-                                ),
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => AddNewReceipt(
-                                        storeName: receipts[i].store,
-                                        price: receipts[i].price,
-                                        date: receipts[i].date,
-                                        image: receipts[i].image,
-                                        itemID: receipts[i].itemID,
-                                      ),
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                          ],
+                        key: Key(
+                          itemList[i].id.toString(),
                         ),
                       ),
                     );
                   },
                 ),
               ),
+              selectedList.length > 0
+                  ? Container(
+                      width: double.infinity,
+                      height: MediaQuery.of(context).size.height * 0.08,
+                      color: Colors.red,
+                      child: IconButton(
+                          icon: Icon(
+                            Icons.delete_forever,
+                            size: MediaQuery.of(context).size.height * 0.05,
+                            color: Colors.white,
+                          ),
+                          onPressed: () async {
+                            for (var i = 0; i < selectedList.length; i++) {
+                              deleteFromFirebase(selectedList[i].itemID);
+                              DBHelper.deleteItem(
+                                  'receipts', selectedList[i].id);
+                            }
+                            await fetchReceipts();
+                            if (receipts.length == 0) {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => Loaded(),
+                                ),
+                              );
+                            }
+                          }),
+                    )
+                  : Container(),
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class GridItem extends StatefulWidget {
+  final Key key;
+  final ReceiptModel item;
+  final ValueChanged<bool> isSelected;
+  final Function openImage;
+  GridItem({this.item, this.isSelected, this.key, this.openImage});
+
+  @override
+  _GridItemState createState() => _GridItemState();
+}
+
+class _GridItemState extends State<GridItem> {
+  bool isSelected = false;
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: () {
+        widget.openImage(widget.item.image);
+      },
+      onLongPress: () {
+        setState(() {
+          isSelected = !isSelected;
+          widget.isSelected(isSelected);
+        });
+      },
+      child: Stack(
+        children: <Widget>[
+          Column(
+            children: [
+              Expanded(
+                child: Container(
+                  child: Image.file(
+                    widget.item.image,
+                    fit: BoxFit.fill,
+                    width: double.infinity,
+                    color: Colors.black.withOpacity(isSelected ? 1 : 0),
+                    colorBlendMode: BlendMode.color,
+                  ),
+                ),
+              ),
+              Container(
+                width: double.infinity,
+                child: Column(
+                  children: [
+                    Text(
+                      " ${widget.item.price} ريال",
+                      textDirection: TextDirection.rtl,
+                    ),
+                    Text(widget.item.date),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          Align(
+            alignment: Alignment.bottomLeft,
+            child: IconButton(
+              icon: Icon(
+                Icons.edit,
+                color: Colors.blue,
+              ),
+              onPressed: () {
+      
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => AddNewReceipt(
+                      storeName: widget.item.store,
+                      price: widget.item.price,
+                      date: widget.item.date,
+                      image: widget.item.image,
+                      itemID: widget.item.itemID,
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          isSelected
+              ? Align(
+                  alignment: Alignment.bottomRight,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Icon(
+                      Icons.check_circle,
+                      color: Colors.red,
+                    ),
+                  ),
+                )
+              : Container()
+        ],
       ),
     );
   }
