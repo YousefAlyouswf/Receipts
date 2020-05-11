@@ -44,6 +44,28 @@ class _OtherReceiptState extends State<OtherReceipt> {
     }
   }
 
+  String _datePicked;
+  void _presentDatePicker() {
+    showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2018),
+      lastDate: DateTime.now(),
+      cancelText: "إلغاء",
+      confirmText: "تم",
+      locale: Locale('ar', 'SA'),
+    ).then((date) {
+      if (date == null) {
+        return;
+      } else {
+        setState(() {
+          _datePicked = "${date.day}/${date.month}/${date.year}";
+        });
+        fetch();
+      }
+    });
+  }
+
   @override
   void initState() {
     super.initState();
@@ -54,7 +76,7 @@ class _OtherReceiptState extends State<OtherReceipt> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.storeName),
+        title: Text("${widget.storeName} ($sumPrice ريال) ",),
         centerTitle: true,
       ),
       body: Column(
@@ -64,15 +86,40 @@ class _OtherReceiptState extends State<OtherReceipt> {
                 top: 16.0, bottom: 16.0, left: 32, right: 32),
             child: Container(
               width: double.infinity,
-              //height: MediaQuery.of(context).size.height * 0.05,
               child: Card(
-                elevation: 10,
-                child: Center(
-                    child: Text(
-                  '$sumPrice ريال ',
-                  textDirection: TextDirection.rtl,
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                )),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    _datePicked == null
+                        ? Container()
+                        : IconButton(
+                            icon: Icon(
+                              Icons.cancel,
+                              color: Colors.red,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _datePicked = null;
+                              });
+                              fetch();
+                            },
+                          ),
+                    Center(
+                      child: Text(
+                        _datePicked == null
+                            ? 'لم يتم أختيار التاريخ'
+                            : '$_datePicked',
+                        textDirection: TextDirection.rtl,
+                      ),
+                    ),
+                    FlatButton.icon(
+                      onPressed: _presentDatePicker,
+                      icon: Icon(Icons.calendar_today),
+                      label: Text('التاريخ'),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -94,8 +141,6 @@ class _OtherReceiptState extends State<OtherReceipt> {
                   ),
                   child: InkWell(
                     onLongPress: () async {
-              
-
                       _save(receipts[i].onlineImage);
                     },
                     onTap: () {

@@ -52,7 +52,6 @@ class _StoresScreenState extends State<StoresScreen> {
       store.add(receiptCount[i].store);
     }
 
-    print(store);
 
     store.forEach((element) {
       if (!map.containsKey(element)) {
@@ -62,7 +61,6 @@ class _StoresScreenState extends State<StoresScreen> {
       }
     });
 
-    print(map['يوسف']);
   }
 
   List<Color> colorList;
@@ -549,7 +547,7 @@ class _StoresScreenState extends State<StoresScreen> {
                                   ),
                                 ),
                                 Text(
-                                  "الفواتير ${map[stores[i].store].toString()}",
+                                  "الفواتير ${map[stores[i].store]}",
                                   textDirection: TextDirection.rtl,
                                 )
                               ],

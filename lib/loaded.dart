@@ -1,8 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:receipt/stores_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
-
+import 'package:http/http.dart' as http;
 import 'database/db_helper.dart';
 import 'models/receipt_model.dart';
 
@@ -59,10 +61,20 @@ class _LoadedState extends State<Loaded> {
   void setUserId() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     if (prefs.getString('uuid') == null) {
-      var uuid = Uuid();
-      String uid = uuid.v1();
+      try {
+        var uuid = Uuid();
+        String uid = uuid.v1();
+        String shortUid = uid.substring(0, 8);
 
-      prefs.setString('uuid', uid.substring(0, 8));
+        String url = "https://receipt-49fc2.firebaseio.com/$shortUid.json";
+        final responce = await http.get(url);
+        final data = json.decode(responce.body) as Map<String, dynamic>;
+        if (data == null) {
+          prefs.setString('uuid', shortUid);
+        } else {
+          setUserId();
+        }
+      } catch (e) {}
     }
   }
 

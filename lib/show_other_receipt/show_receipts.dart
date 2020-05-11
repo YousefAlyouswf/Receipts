@@ -22,7 +22,7 @@ class ShowReceipts extends StatefulWidget {
 
 class _ShowReceiptsState extends State<ShowReceipts> {
   List<ReceiptModel> receipts = [];
- var map = Map();
+  var map = Map();
   void fetch() async {
     try {
       String url =
@@ -30,35 +30,46 @@ class _ShowReceiptsState extends State<ShowReceipts> {
       final responce = await http.get(url);
       final data = json.decode(responce.body) as Map<String, dynamic>;
       List<ReceiptModel> testModel = [];
+
       data.forEach((key, value) {
         testModel.add(ReceiptModel(
           store: key,
-          price: value['price'],
-          date: value['date'],
         ));
       });
       setState(() {
         receipts = testModel;
       });
-List<String> store = [];
-    for (var i = 0; i < receipts.length; i++) {
-      store.add(receipts[i].store);
-    }
+      List<String> store = [];
 
-    print(store);
-
-    
-
-    store.forEach((element) {
-      if (!map.containsKey(element)) {
-        map[element] = 1;
-      } else {
-        map[element] += 1;
+      List<ReceiptModel> toGetAllReceipts = [];
+      for (var i = 0; i < receipts.length; i++) {
+        String url1 =
+            "https://receipt-49fc2.firebaseio.com/${widget.textCode}/${receipts[i].store}.json";
+        final responce1 = await http.get(url1);
+        final data1 = json.decode(responce1.body) as Map<String, dynamic>;
+        List<ReceiptModel> testModel1 = [];
+        data1.forEach((key, value) {
+          testModel1.add(ReceiptModel(
+            store: value['store'],
+          ));
+        });
+        setState(() {
+          toGetAllReceipts = testModel1;
+        });
+        for (var j = 0; j < toGetAllReceipts.length; j++) {
+          store.add(toGetAllReceipts[j].store);
+        }
+        toGetAllReceipts = [];
       }
-    });
+      print(store);
+      store.forEach((element) {
+        if (!map.containsKey(element)) {
+          map[element] = 1;
+        } else {
+          map[element] += 1;
+        }
+      });
 
-    print(map['يوسف']);
-      // Here add friend to data base
       if (widget.saved) {
       } else {
         DBHelper.insertFriend(
@@ -118,26 +129,28 @@ List<String> store = [];
       },
       child: Scaffold(
         appBar: AppBar(
-          title: Text("محفظة ${widget.name}", textDirection: TextDirection.rtl,),
+          title: Text(
+            "محفظة ${widget.name}",
+            textDirection: TextDirection.rtl,
+          ),
           centerTitle: true,
         ),
         body: GridView.builder(
           itemCount: receipts.length,
           gridDelegate:
-              new SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3),
+              new SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
           itemBuilder: (context, i) {
             return Container(
-               decoration: new BoxDecoration(
-                          borderRadius:
-                              new BorderRadius.all(Radius.circular(15)),
-                          image: DecorationImage(
-                              colorFilter: ColorFilter.mode(
-                                  colorList[i], BlendMode.srcATop),
-                              image: AssetImage(
-                                'assets/images/wallet.png',
-                              ),
-                              fit: BoxFit.fitHeight),
-                        ),
+              decoration: new BoxDecoration(
+                borderRadius: new BorderRadius.all(Radius.circular(15)),
+                image: DecorationImage(
+                    colorFilter:
+                        ColorFilter.mode(colorList[i], BlendMode.srcATop),
+                    image: AssetImage(
+                      'assets/images/wallet.png',
+                    ),
+                    fit: BoxFit.fitHeight),
+              ),
               margin: EdgeInsets.all(10),
               child: InkWell(
                 onTap: () {
@@ -152,35 +165,36 @@ List<String> store = [];
                   );
                 },
                 child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              SizedBox(
-                                height: 20,
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: FittedBox(
-                                  fit: BoxFit.contain,
-                                  child: Text(
-                                    receipts[i].store,
-                                    textDirection: TextDirection.rtl,
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                        color: Colors.black,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 18),
-                                  ),
-                                ),
-                              ),
-                              SizedBox(
-                                height: 15,
-                              ),
-                              Text(
-                                "الفواتير ${map[receipts[i].store].toString()}",
-                                textDirection: TextDirection.rtl,
-                              )
-                            ],
-                          ),
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      height: 20,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: FittedBox(
+                        fit: BoxFit.contain,
+                        child: Text(
+                          receipts[i].store,
+                          textDirection: TextDirection.rtl,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18),
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 15,
+                    ),
+                    Text(
+                      "الفواتير ${map[receipts[i].store]}",
+                      textDirection: TextDirection.rtl,
+                    )
+                  ],
+                ),
               ),
             );
           },
