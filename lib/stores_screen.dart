@@ -20,6 +20,7 @@ class StoresScreen extends StatefulWidget {
 }
 
 class _StoresScreenState extends State<StoresScreen> {
+  List<Items> allItems = [];
   List<ReceiptModel> stores = [];
   var map = Map();
   Future<void> fetchStore() async {
@@ -59,6 +60,12 @@ class _StoresScreenState extends State<StoresScreen> {
         map[element] += 1;
       }
     });
+
+    for (var i = 0; i < stores.length; i++) {
+      allItems.add(Items(stores[i].store, map[stores[i].store]));
+    }
+
+    allItems.sort((b, a) => a.count.compareTo(b.count));
   }
 
   List<Color> colorList;
@@ -70,10 +77,10 @@ class _StoresScreenState extends State<StoresScreen> {
     countTheReceipts();
     colorList = [
       Color(0xFF0B84A5),
-      Color(0xFFF6C85F),
+      Color(0xFFCA472F),
       Color(0xFF6F4E7C),
       Color(0xFF9DD866),
-      Color(0xFFCA472F),
+      Color(0xFFF6C85F),
       Color(0xFFFFA056),
       Color(0xFF8DDDD0),
       Color(0xFFF7DC6F),
@@ -81,7 +88,6 @@ class _StoresScreenState extends State<StoresScreen> {
       Color(0xFFEDBB99),
       Color(0xFFcddaab),
       Color(0xFF7cae0f),
-      Color(0xFF2e84d5),
       Color(0xFFe88b4b),
     ];
   }
@@ -93,7 +99,6 @@ class _StoresScreenState extends State<StoresScreen> {
   }
 
   void _showDialog(int id) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
     TextEditingController codeText = TextEditingController();
     TextEditingController friendName = TextEditingController();
 
@@ -172,7 +177,7 @@ class _StoresScreenState extends State<StoresScreen> {
   List<String> services = [
     'إظافة صديق',
     'قائمة الأصدقاء',
-    'شرح إستخدام التطبيق',
+    'حول التطبيق',
   ];
   @override
   Widget build(BuildContext context) {
@@ -190,37 +195,40 @@ class _StoresScreenState extends State<StoresScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            UserAccountsDrawerHeader(
-              accountName: Text(''),
-              accountEmail: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    IconButton(
-                      onPressed: () {
-                        Clipboard.setData(new ClipboardData(text: userID));
+            Container(
+              height: MediaQuery.of(context).size.height / 6,
+              child: UserAccountsDrawerHeader(
+                accountName: Text(''),
+                accountEmail: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      IconButton(
+                        onPressed: () {
+                          Clipboard.setData(new ClipboardData(text: userID));
 
-                        Fluttertoast.showToast(
-                            msg: "تم النسخ",
-                            toastLength: Toast.LENGTH_SHORT,
-                            gravity: ToastGravity.BOTTOM,
-                            timeInSecForIosWeb: 1,
-                            backgroundColor: Colors.grey,
-                            textColor: Colors.white,
-                            fontSize: 16.0);
-                      },
-                      icon: Icon(
-                        Icons.content_copy,
-                        color: Colors.white,
+                          Fluttertoast.showToast(
+                              msg: "تم النسخ",
+                              toastLength: Toast.LENGTH_SHORT,
+                              gravity: ToastGravity.BOTTOM,
+                              timeInSecForIosWeb: 1,
+                              backgroundColor: Colors.grey,
+                              textColor: Colors.white,
+                              fontSize: 16.0);
+                        },
+                        icon: Icon(
+                          Icons.content_copy,
+                          color: Colors.white,
+                        ),
                       ),
-                    ),
-                    Text(
-                      userID,
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
-                    ),
-                  ],
+                      Text(
+                        userID,
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 22),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -384,10 +392,8 @@ class _StoresScreenState extends State<StoresScreen> {
                         ),
                         Icon(
                           i == 0
-                              ? Icons.swap_horiz
-                              : i == 1
-                                  ? Icons.add
-                                  : i == 2 ? Icons.list : Icons.tablet_android,
+                              ? Icons.add
+                              : i == 1 ? Icons.people : Icons.tablet_android,
                         ),
                       ],
                     ),
@@ -481,10 +487,10 @@ class _StoresScreenState extends State<StoresScreen> {
                   )
                 : Expanded(
                     child: GridView.builder(
-                      itemCount: stores.length,
+                      itemCount: allItems.length,
                       gridDelegate:
                           new SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2),
+                              crossAxisCount: 3),
                       itemBuilder: (context, i) {
                         return Container(
                           decoration: new BoxDecoration(
@@ -505,7 +511,8 @@ class _StoresScreenState extends State<StoresScreen> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => ReceiptScreen(
-                                    storeName: stores[i].store,
+                                    storeName: allItems[i].storeName,
+                                    color: colorList[i],
                                   ),
                                 ),
                               );
@@ -514,26 +521,28 @@ class _StoresScreenState extends State<StoresScreen> {
                               mainAxisAlignment: MainAxisAlignment.spaceAround,
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                SizedBox(
-                                  height: 20,
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: FittedBox(
-                                    fit: BoxFit.contain,
-                                    child: Text(
-                                      stores[i].store,
-                                      textDirection: TextDirection.rtl,
-                                      textAlign: TextAlign.center,
-                                      style:
-                                          Theme.of(context).textTheme.headline2,
-                                    ),
+                                SizedBox(),
+                                FittedBox(
+                                  fit: BoxFit.contain,
+                                  child: Text(
+                                    allItems[i].storeName,
+                                    textDirection: TextDirection.rtl,
+                                    textAlign: TextAlign.center,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headline2
+                                        .copyWith(
+                                          color: colorList[i],
+                                        ),
                                   ),
                                 ),
                                 Text(
-                                  "الفواتير ${map[stores[i].store]}",
+                                  "(${allItems[i].count})",
                                   textDirection: TextDirection.rtl,
-                                  style: Theme.of(context).textTheme.headline3,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .headline3
+                                      .copyWith(color: colorList[i]),
                                 )
                               ],
                             ),
@@ -547,4 +556,11 @@ class _StoresScreenState extends State<StoresScreen> {
       ),
     );
   }
+}
+
+class Items {
+  final String storeName;
+  final int count;
+
+  Items(this.storeName, this.count);
 }

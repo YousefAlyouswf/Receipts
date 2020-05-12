@@ -180,18 +180,28 @@ class _ShowReceiptsState extends State<ShowReceipts> {
                           receipts[i].store,
                           textDirection: TextDirection.rtl,
                           textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.headline2,
+                          style: Theme.of(context)
+                              .textTheme
+                              .headline2
+                              .copyWith(color: colorList[i]),
                         ),
                       ),
                     ),
                     SizedBox(
                       height: 15,
                     ),
-                    Text(
-                      "الفواتير ${map[receipts[i].store]}",
-                      textDirection: TextDirection.rtl,
-                       style: Theme.of(context).textTheme.headline3,
-                    )
+                    map[receipts[0].store] == null
+                        ? CircularProgressIndicator(
+                            backgroundColor: colorList[i],
+                          )
+                        : Text(
+                            "الفواتير ${map[receipts[i].store]}",
+                            textDirection: TextDirection.rtl,
+                            style: Theme.of(context)
+                                .textTheme
+                                .headline3
+                                .copyWith(color: colorList[i]),
+                          )
                   ],
                 ),
               ),

@@ -143,7 +143,10 @@ class _AddNewReceiptState extends State<AddNewReceipt> {
     return Scaffold(
       resizeToAvoidBottomPadding: false,
       appBar: AppBar(
-        title: Text("أدخل الفاتورة",style: Theme.of(context).textTheme.headline1,),
+        title: Text(
+          "أدخل الفاتورة",
+          style: Theme.of(context).textTheme.headline1,
+        ),
         centerTitle: true,
       ),
       floatingActionButton: Row(
@@ -237,7 +240,7 @@ class _AddNewReceiptState extends State<AddNewReceipt> {
                                   Fluttertoast.showToast(
                                       msg: "أسم المتجر",
                                       toastLength: Toast.LENGTH_SHORT,
-                                      gravity: ToastGravity.CENTER,
+                                      gravity: ToastGravity.BOTTOM,
                                       timeInSecForIosWeb: 1,
                                       backgroundColor: Colors.red,
                                       textColor: Colors.white,
@@ -246,14 +249,25 @@ class _AddNewReceiptState extends State<AddNewReceipt> {
                                   Fluttertoast.showToast(
                                       msg: "إجمالي الفاتورة",
                                       toastLength: Toast.LENGTH_SHORT,
-                                      gravity: ToastGravity.CENTER,
+                                      gravity: ToastGravity.BOTTOM,
                                       timeInSecForIosWeb: 1,
                                       backgroundColor: Colors.red,
                                       textColor: Colors.white,
                                       fontSize: 16.0);
                                 } else {
+                                  
+                                  if (controllerName.text.length > 16) {
+                                    Fluttertoast.showToast(
+                                      msg: "أسم المتجر أكثر من 15 حرف",
+                                      toastLength: Toast.LENGTH_SHORT,
+                                      gravity: ToastGravity.BOTTOM,
+                                      timeInSecForIosWeb: 1,
+                                      backgroundColor: Colors.red,
+                                      textColor: Colors.white,
+                                      fontSize: 16.0);
+                                    return;
+                                  }
                                   uploadImage();
-
                                   if (isEdited) {
                                     DBHelper.updateData(
                                         'receipts',
@@ -270,7 +284,6 @@ class _AddNewReceiptState extends State<AddNewReceipt> {
                                         itemID);
                                   } else {
                                     currentTimeInSeconds();
-                                    print("---------------->>>>> $itemID");
                                     getDate().then((date) async {
                                       DBHelper.insert(
                                         'receipts',
@@ -295,7 +308,9 @@ class _AddNewReceiptState extends State<AddNewReceipt> {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => ReceiptScreen(storeName:controllerName.text ,),
+                                      builder: (context) => ReceiptScreen(
+                                        storeName: controllerName.text,
+                                      ),
                                     ),
                                   );
                                   Fluttertoast.showToast(

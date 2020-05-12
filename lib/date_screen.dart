@@ -11,8 +11,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class ReceiptScreen extends StatefulWidget {
   final String storeName;
-
-  ReceiptScreen({Key key, this.storeName}) : super(key: key);
+  final Color color;
+  ReceiptScreen({Key key, this.storeName, this.color}) : super(key: key);
 
   @override
   _ReceiptScreenState createState() => _ReceiptScreenState();
@@ -139,8 +139,6 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
     });
   }
 
-
-
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   @override
   void initState() {
@@ -160,7 +158,8 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
         );
       },
       child: Scaffold(
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+        floatingActionButtonLocation: selectedList.length==0? FloatingActionButtonLocation.centerFloat:
+        FloatingActionButtonLocation.startFloat,
         floatingActionButton: FloatingActionButton(
           onPressed: () {
             Navigator.push(
@@ -176,6 +175,7 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
         ),
         key: _scaffoldKey,
         appBar: AppBar(
+          backgroundColor: widget.color,
           title: Text(
             "${widget.storeName} ($sumPrice ريال) ",
             style: Theme.of(context).textTheme.headline1,
@@ -248,6 +248,7 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
                     return Container(
                       margin: EdgeInsets.all(10),
                       child: GridItem(
+                        color: widget.color,
                         openImage: openImage,
                         item: itemList[i],
                         isSelected: (bool value) {
@@ -309,7 +310,8 @@ class GridItem extends StatefulWidget {
   final ReceiptModel item;
   final ValueChanged<bool> isSelected;
   final Function openImage;
-  GridItem({this.item, this.isSelected, this.key, this.openImage});
+  final Color color;
+  GridItem({this.item, this.isSelected, this.key, this.openImage, this.color});
 
   @override
   _GridItemState createState() => _GridItemState();
@@ -321,7 +323,7 @@ class _GridItemState extends State<GridItem> {
   Widget build(BuildContext context) {
     return Container(
       decoration: new BoxDecoration(
-        color: Theme.of(context).primaryColor,
+        color: widget.color.withOpacity(isSelected ? 0.3 : 0.9),
         borderRadius: new BorderRadius.all(Radius.circular(10)),
       ),
       child: InkWell(
@@ -344,7 +346,6 @@ class _GridItemState extends State<GridItem> {
                       widget.item.image,
                       fit: BoxFit.fill,
                       width: double.infinity,
-                      color: Colors.black.withOpacity(isSelected ? 1 : 0),
                       colorBlendMode: BlendMode.color,
                     ),
                   ),
@@ -356,13 +357,13 @@ class _GridItemState extends State<GridItem> {
                       Text(
                         " ${widget.item.price} ريال",
                         textDirection: TextDirection.rtl,
-                            style: Theme.of(context).textTheme.headline3,
+                        style: Theme.of(context).textTheme.headline3,
                       ),
                       Center(
                         child: Text(
                           widget.item.date,
                           textDirection: TextDirection.rtl,
-                             style: Theme.of(context).textTheme.headline3,
+                          style: Theme.of(context).textTheme.headline3,
                         ),
                       ),
                     ],
