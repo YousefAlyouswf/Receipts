@@ -158,8 +158,9 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
         );
       },
       child: Scaffold(
-        floatingActionButtonLocation: selectedList.length==0? FloatingActionButtonLocation.centerFloat:
-        FloatingActionButtonLocation.startFloat,
+        floatingActionButtonLocation: selectedList.length == 0
+            ? FloatingActionButtonLocation.centerFloat
+            : FloatingActionButtonLocation.startFloat,
         floatingActionButton: FloatingActionButton(
           onPressed: () {
             Navigator.push(
@@ -167,6 +168,7 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
               MaterialPageRoute(
                 builder: (context) => AddNewReceipt(
                   storeName: widget.storeName,
+                  color: widget.color,
                 ),
               ),
             );
@@ -195,6 +197,7 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
                   //height: MediaQuery.of(context).size.height * 0.05,
                   child: Card(
                     shadowColor: Theme.of(context).primaryColor,
+                    color: widget.color.withOpacity(0.3),
                     elevation: 10,
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -205,7 +208,7 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
                             : IconButton(
                                 icon: Icon(
                                   Icons.cancel,
-                                  color: Colors.red,
+                                  color: Colors.black,
                                 ),
                                 onPressed: () {
                                   setState(() {
@@ -217,7 +220,7 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
                         Center(
                           child: Text(
                             _datePicked == null
-                                ? 'لم يتم أختيار التاريخ'
+                                ? 'أختر التاريخ لفرز الفواتير'
                                 : '$_datePicked',
                             textDirection: TextDirection.rtl,
                             style: Theme.of(context).textTheme.headline3,
@@ -379,7 +382,7 @@ class _GridItemState extends State<GridItem> {
                   color: Colors.white,
                 ),
                 onPressed: () {
-                  print(widget.item.itemID);
+                  print(widget.color);
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -389,6 +392,7 @@ class _GridItemState extends State<GridItem> {
                         date: widget.item.date,
                         image: widget.item.image,
                         itemID: widget.item.itemID,
+                        color: widget.color,
                       ),
                     ),
                   );

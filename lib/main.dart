@@ -24,9 +24,9 @@ class MyApp extends StatelessWidget {
           headline1: TextStyle(color: Colors.white, fontSize: 22),
           headline2: TextStyle(
               color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold),
-          headline3: TextStyle(color: Colors.black, fontSize: 15),
+          headline3: TextStyle(color: Colors.white, fontSize: 15),
         ),
-        colorScheme: ColorScheme.light(primary: const Color(0xFF006700)),
+        colorScheme: ColorScheme.light(primary: const Color(0xFF000000)),
         buttonTheme: ButtonThemeData(textTheme: ButtonTextTheme.primary),
         floatingActionButtonTheme: FloatingActionButtonThemeData(
           backgroundColor: Colors.orange,

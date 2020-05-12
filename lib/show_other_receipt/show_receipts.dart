@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:pie_chart/pie_chart.dart';
 import 'package:receipt/database/db_helper.dart';
 import 'package:receipt/models/receipt_model.dart';
 import 'package:http/http.dart' as http;
@@ -13,7 +14,8 @@ class ShowReceipts extends StatefulWidget {
   final String textCode;
   final String name;
   final bool saved;
-  ShowReceipts({Key key, this.textCode, this.name, this.saved})
+  final Map<String, double> dataMap;
+  ShowReceipts({Key key, this.textCode, this.name, this.saved, this.dataMap})
       : super(key: key);
 
   @override
@@ -22,6 +24,7 @@ class ShowReceipts extends StatefulWidget {
 
 class _ShowReceiptsState extends State<ShowReceipts> {
   List<ReceiptModel> receipts = [];
+  List<Items> allItems = [];
   var map = Map();
   void fetch() async {
     try {
@@ -69,7 +72,11 @@ class _ShowReceiptsState extends State<ShowReceipts> {
           map[element] += 1;
         }
       });
+      for (var i = 0; i < receipts.length; i++) {
+        allItems.add(Items(receipts[i].store, map[receipts[i].store]));
+      }
 
+      allItems.sort((b, a) => a.count.compareTo(b.count));
       if (widget.saved) {
       } else {
         DBHelper.insertFriend(
@@ -99,20 +106,45 @@ class _ShowReceiptsState extends State<ShowReceipts> {
     super.initState();
     fetch();
     colorList = [
-      Color(0xFFF7DC6F),
-      Color(0xFFA2D9CE),
-      Color(0xFFEDBB99),
-      Color(0xFFcddaab),
-      Color(0xFF7cae0f),
-      Color(0xFF2e84d5),
       Color(0xFFe88b4b),
-      Color(0xFF0B84A5),
-      Color(0xFFF6C85F),
-      Color(0xFF6F4E7C),
-      Color(0xFF9DD866),
-      Color(0xFFCA472F),
-      Color(0xFFFFA056),
-      Color(0xFF8DDDD0),
+      Color(0xFF38085C),
+      Color(0xFFA19600),
+      Color(0xFF081C63),
+      Color(0xFF9B6701),
+      Color(0xFF013D73),
+      Color(0xFF994F06),
+      Color(0xFF006E6F),
+      Color(0xFF972D1D),
+      Color(0xFF006C3B),
+      Color(0xFF8F0407),
+      Color(0xFF3E7927),
+      Color(0xFF69015A),
+      Color(0xFFe88b4b),
+      Color(0xFF38085C),
+      Color(0xFFA19600),
+      Color(0xFF081C63),
+      Color(0xFF9B6701),
+      Color(0xFF013D73),
+      Color(0xFF994F06),
+      Color(0xFF006E6F),
+      Color(0xFF972D1D),
+      Color(0xFF006C3B),
+      Color(0xFF8F0407),
+      Color(0xFF3E7927),
+      Color(0xFF69015A),
+      Color(0xFFe88b4b),
+      Color(0xFF38085C),
+      Color(0xFFA19600),
+      Color(0xFF081C63),
+      Color(0xFF9B6701),
+      Color(0xFF013D73),
+      Color(0xFF994F06),
+      Color(0xFF006E6F),
+      Color(0xFF972D1D),
+      Color(0xFF006C3B),
+      Color(0xFF8F0407),
+      Color(0xFF3E7927),
+      Color(0xFF69015A),
     ];
   }
 
@@ -129,6 +161,7 @@ class _ShowReceiptsState extends State<ShowReceipts> {
       },
       child: Scaffold(
         appBar: AppBar(
+          backgroundColor: Colors.blue[800],
           title: Text(
             "محفظة ${widget.name}",
             style: Theme.of(context).textTheme.headline1,
@@ -136,10 +169,33 @@ class _ShowReceiptsState extends State<ShowReceipts> {
           ),
           centerTitle: true,
         ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
+        floatingActionButton: FloatingActionButton(
+          heroTag: "btn1",
+          onPressed: () {
+            showModalBottomSheet(
+              isScrollControlled: true,
+              backgroundColor: Colors.transparent,
+              context: context,
+              builder: (context) => Container(
+                color: Colors.white54,
+                height: MediaQuery.of(context).size.height,
+                width: MediaQuery.of(context).size.width,
+                child: PieChart(
+                  chartLegendSpacing: 20,
+                  dataMap: widget.dataMap,
+                  colorList: colorList,
+                  showLegends: true,
+                ),
+              ),
+            );
+          },
+          child: Icon(Icons.pie_chart),
+        ),
         body: GridView.builder(
-          itemCount: receipts.length,
+          itemCount: allItems.length,
           gridDelegate:
-              new SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
+              new SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3),
           itemBuilder: (context, i) {
             return Container(
               decoration: new BoxDecoration(
@@ -159,8 +215,9 @@ class _ShowReceiptsState extends State<ShowReceipts> {
                     context,
                     MaterialPageRoute(
                       builder: (context) => OtherReceipt(
-                        storeName: receipts[i].store,
+                        storeName: allItems[i].storeName,
                         textCode: widget.textCode,
+                        color: colorList[i],
                       ),
                     ),
                   );
@@ -169,33 +226,25 @@ class _ShowReceiptsState extends State<ShowReceipts> {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: FittedBox(
-                        fit: BoxFit.contain,
-                        child: Text(
-                          receipts[i].store,
-                          textDirection: TextDirection.rtl,
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context)
-                              .textTheme
-                              .headline2
-                              .copyWith(color: colorList[i]),
-                        ),
+                    SizedBox(),
+                    FittedBox(
+                      fit: BoxFit.contain,
+                      child: Text(
+                        allItems[i].storeName,
+                        textDirection: TextDirection.rtl,
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context)
+                            .textTheme
+                            .headline2
+                            .copyWith(color: colorList[i]),
                       ),
                     ),
-                    SizedBox(
-                      height: 15,
-                    ),
-                    map[receipts[0].store] == null
+                    allItems[i].count == null
                         ? CircularProgressIndicator(
                             backgroundColor: colorList[i],
                           )
                         : Text(
-                            "الفواتير ${map[receipts[i].store]}",
+                            "(${allItems[i].count})",
                             textDirection: TextDirection.rtl,
                             style: Theme.of(context)
                                 .textTheme
@@ -211,4 +260,11 @@ class _ShowReceiptsState extends State<ShowReceipts> {
       ),
     );
   }
+}
+
+class Items {
+  final String storeName;
+  final int count;
+
+  Items(this.storeName, this.count);
 }

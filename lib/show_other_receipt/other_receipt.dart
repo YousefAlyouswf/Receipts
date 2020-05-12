@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +12,8 @@ import 'package:receipt/models/receipt_model.dart';
 class OtherReceipt extends StatefulWidget {
   final String storeName;
   final String textCode;
-  const OtherReceipt({Key key, this.storeName, this.textCode})
+  final Color color;
+  const OtherReceipt({Key key, this.storeName, this.textCode, this.color})
       : super(key: key);
 
   @override
@@ -34,6 +36,7 @@ class _OtherReceiptState extends State<OtherReceipt> {
           price: value['price'],
           date: value['date'],
           onlineImage: value['image'],
+          dateTime: value['dateTime'],
         ));
       } else {
         if (value['date'] == _datePicked) {
@@ -42,6 +45,7 @@ class _OtherReceiptState extends State<OtherReceipt> {
             price: value['price'],
             date: value['date'],
             onlineImage: value['image'],
+            dateTime: value['dateTime'],
           ));
         }
       }
@@ -52,6 +56,10 @@ class _OtherReceiptState extends State<OtherReceipt> {
     sumPrice = 0;
     for (var i = 0; i < receipts.length; i++) {
       sumPrice += double.parse(receipts[i].price);
+    }
+    receipts.sort((b, a) => a.dateTime.compareTo(b.dateTime));
+    for (var i = 0; i < receipts.length; i++) {
+      print(receipts[i].date);
     }
   }
 
@@ -77,6 +85,22 @@ class _OtherReceiptState extends State<OtherReceipt> {
     });
   }
 
+  void openImage(String image) {
+    showModalBottomSheet(
+      isScrollControlled: true,
+      isDismissible: true,
+      elevation: 0,
+      enableDrag: true,
+      barrierColor: Colors.white,
+      context: context,
+      builder: (context) => PhotoView(
+        imageProvider: NetworkImage(
+          image,
+        ),
+      ),
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -87,6 +111,7 @@ class _OtherReceiptState extends State<OtherReceipt> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: widget.color,
         title: Text(
           "${widget.storeName} ($sumPrice ريال) ",
           style: Theme.of(context).textTheme.headline1,
@@ -101,6 +126,9 @@ class _OtherReceiptState extends State<OtherReceipt> {
             child: Container(
               width: double.infinity,
               child: Card(
+                shadowColor: Theme.of(context).primaryColor,
+                color: widget.color.withOpacity(0.3),
+                elevation: 10,
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -152,6 +180,7 @@ class _OtherReceiptState extends State<OtherReceipt> {
                 return Container(
                   margin: EdgeInsets.all(10),
                   decoration: BoxDecoration(
+                    borderRadius: new BorderRadius.all(Radius.circular(10)),
                     border: Border.all(
                       color: Colors.grey,
                       width: 1,
@@ -162,28 +191,7 @@ class _OtherReceiptState extends State<OtherReceipt> {
                       _save(receipts[i].onlineImage);
                     },
                     onTap: () {
-                      //   openImage(receipts[i].image);
-                      Navigator.of(context).push(
-                        new MaterialPageRoute<Null>(
-                          builder: (BuildContext context) {
-                            return Container(
-                              color: Colors.transparent,
-                              child: Dialog(
-                                child: Container(
-                                  height: MediaQuery.of(context).size.height,
-                                  width: MediaQuery.of(context).size.width,
-                                  child: PhotoView(
-                                    imageProvider: NetworkImage(
-                                      receipts[i].onlineImage,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            );
-                          },
-                          fullscreenDialog: true,
-                        ),
-                      );
+                      openImage(receipts[i].onlineImage);
                     },
                     child: Column(
                       children: <Widget>[
@@ -223,8 +231,7 @@ class _OtherReceiptState extends State<OtherReceipt> {
   _save(String image) async {
     var response = await Dio()
         .get(image, options: Options(responseType: ResponseType.bytes));
-    final result =
-        await ImageGallerySaver.saveImage(Uint8List.fromList(response.data));
-    print(result);
+
+    await ImageGallerySaver.saveImage(Uint8List.fromList(response.data));
   }
 }

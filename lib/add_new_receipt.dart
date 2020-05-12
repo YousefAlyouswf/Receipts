@@ -21,9 +21,16 @@ class AddNewReceipt extends StatefulWidget {
   final String date;
   final File image;
   final String itemID;
+  final Color color;
 
   const AddNewReceipt(
-      {Key key, this.storeName, this.price, this.image, this.date, this.itemID})
+      {Key key,
+      this.storeName,
+      this.price,
+      this.image,
+      this.date,
+      this.itemID,
+      this.color})
       : super(key: key);
 
   @override
@@ -255,16 +262,15 @@ class _AddNewReceiptState extends State<AddNewReceipt> {
                                       textColor: Colors.white,
                                       fontSize: 16.0);
                                 } else {
-                                  
                                   if (controllerName.text.length > 16) {
                                     Fluttertoast.showToast(
-                                      msg: "أسم المتجر أكثر من 15 حرف",
-                                      toastLength: Toast.LENGTH_SHORT,
-                                      gravity: ToastGravity.BOTTOM,
-                                      timeInSecForIosWeb: 1,
-                                      backgroundColor: Colors.red,
-                                      textColor: Colors.white,
-                                      fontSize: 16.0);
+                                        msg: "أسم المتجر أكثر من 15 حرف",
+                                        toastLength: Toast.LENGTH_SHORT,
+                                        gravity: ToastGravity.BOTTOM,
+                                        timeInSecForIosWeb: 1,
+                                        backgroundColor: Colors.red,
+                                        textColor: Colors.white,
+                                        fontSize: 16.0);
                                     return;
                                   }
                                   uploadImage();
@@ -305,14 +311,24 @@ class _AddNewReceiptState extends State<AddNewReceipt> {
                                     });
                                   }
 
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => ReceiptScreen(
-                                        storeName: controllerName.text,
+                                  if (widget.color == null) {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => Loaded()),
+                                    );
+                                  } else {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => ReceiptScreen(
+                                          storeName: controllerName.text,
+                                          color: widget.color,
+                                        ),
                                       ),
-                                    ),
-                                  );
+                                    );
+                                  }
+
                                   Fluttertoast.showToast(
                                       msg: "تم حفظ الفاتورة",
                                       toastLength: Toast.LENGTH_SHORT,
@@ -391,6 +407,9 @@ class _AddNewReceiptState extends State<AddNewReceipt> {
                 'image': urlImage,
                 'date': _datePicked == null ? date : _datePicked,
                 'id': itemID,
+                'dateTime': _dateTimePicked == null
+                    ? currentTimeInSeconds()
+                    : _dateTimePicked,
               },
             ),
           );
@@ -407,6 +426,9 @@ class _AddNewReceiptState extends State<AddNewReceipt> {
                 'image': urlImage,
                 'date': _datePicked == null ? date : _datePicked,
                 'id': itemID,
+                'dateTime': _dateTimePicked == null
+                    ? currentTimeInSeconds()
+                    : _dateTimePicked,
               },
             ),
           );

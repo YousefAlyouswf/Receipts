@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -10,6 +12,7 @@ import 'package:receipt/show_other_receipt/show_receipts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'add_new_receipt.dart';
 import 'package:liquid_progress_indicator/liquid_progress_indicator.dart';
+import 'package:http/http.dart' as http;
 
 class StoresScreen extends StatefulWidget {
   final Map<String, double> dataMap;
@@ -76,18 +79,44 @@ class _StoresScreenState extends State<StoresScreen> {
     fetchStore();
     countTheReceipts();
     colorList = [
-      Color(0xFF0B84A5),
-      Color(0xFFCA472F),
-      Color(0xFF6F4E7C),
-      Color(0xFF9DD866),
-      Color(0xFFF6C85F),
-      Color(0xFFFFA056),
-      Color(0xFF8DDDD0),
-      Color(0xFFF7DC6F),
-      Color(0xFFA2D9CE),
-      Color(0xFFEDBB99),
-      Color(0xFFcddaab),
-      Color(0xFF7cae0f),
+      Color(0xFF69015A),
+      Color(0xFF3E7927),
+      Color(0xFF8F0407),
+      Color(0xFF006C3B),
+      Color(0xFF972D1D),
+      Color(0xFF006E6F),
+      Color(0xFF994F06),
+      Color(0xFF013D73),
+      Color(0xFF9B6701),
+      Color(0xFF081C63),
+      Color(0xFFA19600),
+      Color(0xFF38085C),
+      Color(0xFFe88b4b),
+      Color(0xFF69015A),
+      Color(0xFF3E7927),
+      Color(0xFF8F0407),
+      Color(0xFF006C3B),
+      Color(0xFF972D1D),
+      Color(0xFF006E6F),
+      Color(0xFF994F06),
+      Color(0xFF013D73),
+      Color(0xFF9B6701),
+      Color(0xFF081C63),
+      Color(0xFFA19600),
+      Color(0xFF38085C),
+      Color(0xFFe88b4b),
+      Color(0xFF69015A),
+      Color(0xFF3E7927),
+      Color(0xFF8F0407),
+      Color(0xFF006C3B),
+      Color(0xFF972D1D),
+      Color(0xFF006E6F),
+      Color(0xFF994F06),
+      Color(0xFF013D73),
+      Color(0xFF9B6701),
+      Color(0xFF081C63),
+      Color(0xFFA19600),
+      Color(0xFF38085C),
       Color(0xFFe88b4b),
     ];
   }
@@ -304,7 +333,9 @@ class _StoresScreenState extends State<StoresScreen> {
                                                 );
                                               },
                                             ),
-                                            onTap: () {
+                                            onTap: () async {
+                                              await fetchintoMap(
+                                                  frindes[index].code);
                                               Navigator.push(
                                                 context,
                                                 MaterialPageRoute(
@@ -314,9 +345,11 @@ class _StoresScreenState extends State<StoresScreen> {
                                                     textCode:
                                                         frindes[index].code,
                                                     name: frindes[index].name,
+                                                    dataMap: dataMap,
                                                   ),
                                                 ),
                                               );
+                                              print(dataMap);
                                             },
                                           ),
                                         ),
@@ -555,6 +588,76 @@ class _StoresScreenState extends State<StoresScreen> {
         ),
       ),
     );
+  }
+
+  List<ReceiptModel> storesForMap = [];
+
+  Map<String, double> dataMap;
+
+  Future<void> fetchintoMap(String userid) async {
+    String url = "https://receipt-49fc2.firebaseio.com/$userid.json";
+    final responce = await http.get(url);
+    final data = json.decode(responce.body) as Map<String, dynamic>;
+    List<String> storesFromFirebase = [];
+    data.forEach((key, value) {
+      storesFromFirebase.add(key);
+    });
+
+    List<ReceiptModel> toGetAllPrice = [];
+    storesForMap = [];
+    for (var i = 0; i < storesFromFirebase.length; i++) {
+      String url1 =
+          "https://receipt-49fc2.firebaseio.com/$userid/${storesFromFirebase[i]}.json";
+      final responce1 = await http.get(url1);
+      final data1 = json.decode(responce1.body) as Map<String, dynamic>;
+      List<ReceiptModel> testModel1 = [];
+      data1.forEach((key, value) {
+        testModel1.add(ReceiptModel(
+          store: value['store'],
+          price: value['price'],
+        ));
+      });
+      setState(() {
+        toGetAllPrice = testModel1;
+      });
+      for (var j = 0; j < toGetAllPrice.length; j++) {
+        storesForMap.add(ReceiptModel(
+            store: toGetAllPrice[j].store, price: toGetAllPrice[j].price));
+      }
+      toGetAllPrice = [];
+    }
+
+    List<String> stor = [];
+    List<double> price = [];
+
+    for (var i = 0; i < storesForMap.length; i++) {
+      stor.add(storesForMap[i].store);
+      price.add(double.parse(storesForMap[i].price));
+    }
+
+    List<double> newPrice = [];
+    List<String> newStore = [];
+    for (var i = 0; i < stor.length; i++) {
+      bool x = newStore.contains(stor[i]);
+      if (!x) {
+        newStore.add(stor[i]);
+        double x = 0;
+        for (var j = 0; j < stor.length; j++) {
+          if (stor[i] == stor[j]) {
+            x += price[j];
+          }
+        }
+        newPrice.add(x);
+      }
+    }
+    print(newStore);
+    print(newPrice);
+    dataMap = new Map();
+    for (var i = 0; i < newStore.length; i++) {
+      //dataMap.putIfAbsent(newStore[i], () => newPrice[i]);
+      dataMap[newStore[i]] = newPrice[i];
+    }
+    print(dataMap);
   }
 }
 

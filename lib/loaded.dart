@@ -56,6 +56,7 @@ class _LoadedState extends State<Loaded> {
     for (var i = 0; i < newStore.length; i++) {
       dataMap.putIfAbsent(newStore[i], () => newPrice[i]);
     }
+    
   }
 
   void setUserId() async {
