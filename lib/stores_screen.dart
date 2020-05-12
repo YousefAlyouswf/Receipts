@@ -52,7 +52,6 @@ class _StoresScreenState extends State<StoresScreen> {
       store.add(receiptCount[i].store);
     }
 
-
     store.forEach((element) {
       if (!map.containsKey(element)) {
         map[element] = 1;
@@ -60,14 +59,13 @@ class _StoresScreenState extends State<StoresScreen> {
         map[element] += 1;
       }
     });
-
   }
 
   List<Color> colorList;
   @override
   void initState() {
     super.initState();
-
+    initUserID();
     fetchStore();
     countTheReceipts();
     colorList = [
@@ -88,6 +86,12 @@ class _StoresScreenState extends State<StoresScreen> {
     ];
   }
 
+  String userID = '';
+  void initUserID() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    userID = prefs.getString('uuid');
+  }
+
   void _showDialog(int id) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     TextEditingController codeText = TextEditingController();
@@ -97,114 +101,75 @@ class _StoresScreenState extends State<StoresScreen> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        if (id == 0) {
-          return AlertDialog(
-            title: new Text(
-              "رقم عرض الفواتير",
-              textDirection: TextDirection.rtl,
+        return AlertDialog(
+          title: new Text(
+            "أدخل رقم الكود",
+            textDirection: TextDirection.rtl,
+          ),
+          content: Container(
+            height: MediaQuery.of(context).size.height * 0.2,
+            child: Column(
+              children: [
+                TextField(
+                  textAlign: TextAlign.end,
+                  controller: codeText,
+                  decoration: new InputDecoration(
+                    border: OutlineInputBorder(),
+                    hintText: "رقم الكود",
+                  ),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                TextField(
+                  textAlign: TextAlign.end,
+                  controller: friendName,
+                  decoration: new InputDecoration(
+                      border: OutlineInputBorder(), hintText: "أسم الصديق"),
+                ),
+              ],
             ),
-            content: Text(
-              prefs.getString('uuid'),
+          ),
+          actions: <Widget>[
+            new FlatButton(
+              child: new Text("إلغاء"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
             ),
-            actions: <Widget>[
-              new FlatButton(
-                child: new Text("إلغاء"),
+            new FlatButton(
+                child: new Text("عرض"),
                 onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-              new FlatButton(
-                child: new Text("نسخ"),
-                onPressed: () {
-                  Clipboard.setData(
-                      new ClipboardData(text: prefs.getString('uuid')));
-                  Navigator.of(context).pop();
-                  Fluttertoast.showToast(
-                      msg: "تم النسخ",
+                  if (codeText.text == '' || friendName.text == '') {
+                    Fluttertoast.showToast(
+                      msg: "يجب تعبئة الحقول",
                       toastLength: Toast.LENGTH_SHORT,
                       gravity: ToastGravity.BOTTOM,
                       timeInSecForIosWeb: 1,
                       backgroundColor: Colors.grey,
                       textColor: Colors.white,
-                      fontSize: 16.0);
-                },
-              ),
-            ],
-          );
-        } else if (id == 1) {
-          return AlertDialog(
-            title: new Text(
-              "أدخل رقم الكود",
-              textDirection: TextDirection.rtl,
-            ),
-            content: Container(
-              height: MediaQuery.of(context).size.height * 0.2,
-              child: Column(
-                children: [
-                  TextField(
-                    textAlign: TextAlign.end,
-                    controller: codeText,
-                    decoration: new InputDecoration(
-                      border: OutlineInputBorder(),
-                      hintText: "رقم الكود",
-                    ),
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  TextField(
-                    textAlign: TextAlign.end,
-                    controller: friendName,
-                    decoration: new InputDecoration(
-                        border: OutlineInputBorder(), hintText: "أسم الصديق"),
-                  ),
-                ],
-              ),
-            ),
-            actions: <Widget>[
-              new FlatButton(
-                child: new Text("إلغاء"),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-              new FlatButton(
-                  child: new Text("عرض"),
-                  onPressed: () {
-                    if (codeText.text == '' || friendName.text == '') {
-                      Fluttertoast.showToast(
-                        msg: "يجب تعبئة الحقول",
-                        toastLength: Toast.LENGTH_SHORT,
-                        gravity: ToastGravity.BOTTOM,
-                        timeInSecForIosWeb: 1,
-                        backgroundColor: Colors.grey,
-                        textColor: Colors.white,
-                        fontSize: 16.0,
-                      );
-                    } else {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ShowReceipts(
-                            textCode: codeText.text,
-                            name: friendName.text,
-                            saved: false,
-                          ),
+                      fontSize: 16.0,
+                    );
+                  } else {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ShowReceipts(
+                          textCode: codeText.text,
+                          name: friendName.text,
+                          saved: false,
                         ),
-                      );
-                    }
-                  }),
-            ],
-          );
-        } else {
-          return null;
-        }
+                      ),
+                    );
+                  }
+                }),
+          ],
+        );
       },
     );
   }
 
   List<String> services = [
-    'عرض الرقم',
     'إظافة صديق',
     'قائمة الأصدقاء',
     'شرح إستخدام التطبيق',
@@ -214,7 +179,10 @@ class _StoresScreenState extends State<StoresScreen> {
     return Scaffold(
       resizeToAvoidBottomPadding: false,
       appBar: AppBar(
-        title: Text("محفظتي"),
+        title: Text(
+          "محفظتي",
+          style: Theme.of(context).textTheme.headline1,
+        ),
         centerTitle: true,
       ),
       endDrawer: Drawer(
@@ -222,191 +190,209 @@ class _StoresScreenState extends State<StoresScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            //  Text('محفظتي تطبيق لحفظ فواتيرك ومشاركتها مع الاصدقاء'),
+            UserAccountsDrawerHeader(
+              accountName: Text(''),
+              accountEmail: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    IconButton(
+                      onPressed: () {
+                        Clipboard.setData(new ClipboardData(text: userID));
+
+                        Fluttertoast.showToast(
+                            msg: "تم النسخ",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.BOTTOM,
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: Colors.grey,
+                            textColor: Colors.white,
+                            fontSize: 16.0);
+                      },
+                      icon: Icon(
+                        Icons.content_copy,
+                        color: Colors.white,
+                      ),
+                    ),
+                    Text(
+                      userID,
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
+                    ),
+                  ],
+                ),
+              ),
+            ),
             Expanded(
-              child: Padding(
-                padding: const EdgeInsets.only(top: 32.0),
-                child: ListView.builder(
-                  itemCount: services.length,
-                  itemBuilder: (ctx, i) {
-                    return ListTile(
-                      onTap: () async {
-                        if (i == 0) {
-                          _showDialog(i);
-                        } else if (i == 1) {
-                          _showDialog(i);
-                        } else if (i == 2) {
-                          Navigator.of(context).pop();
-                          List<Friends> frindes = [];
-                          final storeList =
-                              await DBHelper.getDataFriend('friend');
-                          setState(() {
-                            frindes = storeList
-                                .map(
-                                  (item) => Friends(
-                                    id: item['id'],
-                                    name: item['name'],
-                                    code: item['code'],
+              child: ListView.builder(
+                itemCount: services.length,
+                itemBuilder: (ctx, i) {
+                  return ListTile(
+                    onTap: () async {
+                      if (i == 0) {
+                        _showDialog(i);
+                      } else if (i == 1) {
+                        Navigator.of(context).pop();
+                        List<Friends> frindes = [];
+                        final storeList =
+                            await DBHelper.getDataFriend('friend');
+                        setState(() {
+                          frindes = storeList
+                              .map(
+                                (item) => Friends(
+                                  id: item['id'],
+                                  name: item['name'],
+                                  code: item['code'],
+                                ),
+                              )
+                              .toList();
+                        });
+                        showModalBottomSheet(
+                          backgroundColor: Colors.white,
+                          context: context,
+                          builder: (context) => frindes.length == 0
+                              ? Center(
+                                  child: Text(
+                                    "لا يوجد أصدقاء",
+                                    style: TextStyle(
+                                        fontSize: 24, color: Colors.black),
                                   ),
                                 )
-                                .toList();
-                          });
-                          showModalBottomSheet(
-                            backgroundColor: Colors.white,
-                            context: context,
-                            builder: (context) => frindes.length == 0
-                                ? Center(
-                                    child: Text(
-                                      "لا يوجد أصدقاء",
-                                      style: TextStyle(
-                                          fontSize: 24, color: Colors.black),
-                                    ),
-                                  )
-                                : Container(
-                                    color: Colors.white,
-                                    height: MediaQuery.of(context).size.height,
-                                    width: MediaQuery.of(context).size.width,
-                                    child: ListView.builder(
-                                      itemCount: frindes.length,
-                                      itemBuilder: (ctx, index) {
-                                        return Padding(
-                                          padding: const EdgeInsets.all(32.0),
-                                          child: Card(
-                                            child: ListTile(
-                                              title: Text(
-                                                frindes[index].name,
-                                                textDirection:
-                                                    TextDirection.rtl,
-                                                style: TextStyle(
-                                                  fontSize: 24,
-                                                  color: Colors.black,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
+                              : Container(
+                                  color: Colors.white,
+                                  height: MediaQuery.of(context).size.height,
+                                  width: MediaQuery.of(context).size.width,
+                                  child: ListView.builder(
+                                    itemCount: frindes.length,
+                                    itemBuilder: (ctx, index) {
+                                      return Padding(
+                                        padding: const EdgeInsets.all(32.0),
+                                        child: Card(
+                                          child: ListTile(
+                                            title: Text(
+                                              frindes[index].name,
+                                              textDirection: TextDirection.rtl,
+                                              style: TextStyle(
+                                                fontSize: 24,
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.bold,
                                               ),
-                                              subtitle: Text(
-                                                frindes[index].code,
-                                                textDirection:
-                                                    TextDirection.rtl,
-                                                style: TextStyle(
-                                                    color: Colors.grey,
-                                                    fontSize: 12),
-                                              ),
-                                              leading: IconButton(
-                                                icon: Icon(Icons.delete),
-                                                color: Colors.red,
-                                                onPressed: () async {
-                                                  DBHelper.deleteFriend(
-                                                    'friend',
-                                                    frindes[index].id,
-                                                  );
-                                                },
-                                              ),
-                                              onTap: () {
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        ShowReceipts(
-                                                      saved: true,
-                                                      textCode:
-                                                          frindes[index].code,
-                                                      name: frindes[index].name,
-                                                    ),
-                                                  ),
+                                            ),
+                                            subtitle: Text(
+                                              frindes[index].code,
+                                              textDirection: TextDirection.rtl,
+                                              style: TextStyle(
+                                                  color: Colors.grey,
+                                                  fontSize: 12),
+                                            ),
+                                            leading: IconButton(
+                                              icon: Icon(Icons.delete),
+                                              color: Colors.red,
+                                              onPressed: () async {
+                                                DBHelper.deleteFriend(
+                                                  'friend',
+                                                  frindes[index].id,
                                                 );
                                               },
                                             ),
+                                            onTap: () {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      ShowReceipts(
+                                                    saved: true,
+                                                    textCode:
+                                                        frindes[index].code,
+                                                    name: frindes[index].name,
+                                                  ),
+                                                ),
+                                              );
+                                            },
                                           ),
-                                        );
-                                      },
-                                    ),
-                                  ),
-                          );
-                        } else if (i == 3) {
-                          TextStyle style = TextStyle(fontSize: 18);
-                          showModalBottomSheet(
-                              backgroundColor: Colors.white,
-                              context: context,
-                              builder: (context) => SingleChildScrollView(
-                                    child: Container(
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(32.0),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.end,
-                                          children: [
-                                            Center(
-                                              child: Text(
-                                                'تطبيق محفظتي',
-                                                textDirection:
-                                                    TextDirection.rtl,
-                                                style: style,
-                                              ),
-                                            ),
-                                            Text(
-                                              'يحفظ لك جميع فواتيرك ومشترياتك عن طريق تصوير الفاتورة وادخال اسم المتجر والسعر الاجمالي للفاتورة',
-                                              textDirection: TextDirection.rtl,
-                                              style: style,
-                                            ),
-                                            Text(
-                                              'يسمح لك التطبيق بمشاركة فواتيرك و مشترياتك مع الاصدقاء والأهل',
-                                              textDirection: TextDirection.rtl,
-                                              style: style,
-                                            ),
-                                            Center(
-                                              child: Text(
-                                                'القائمة الجانبية',
-                                                textDirection: TextDirection.rtl,
-                                                style: style,
-                                              ),
-                                            ),
-                                            Text(
-                                              'عرض رقمك الخاص الذي يسمح لأصدقائك بالاطلاع على فواتيرك',
-                                              textDirection: TextDirection.rtl,
-                                              style: style,
-                                            ),
-                                            Text(
-                                              'إظافة صديق عن طريق رقمه الظاهر في تطبيقه الخاص لإظافته في قائمتك والإطلاع على فواتيره بشكل مستمر',
-                                              textDirection: TextDirection.rtl,
-                                              style: style,
-                                            ),
-                                          ],
                                         ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                        );
+                      } else if (i == 2) {
+                        TextStyle style = TextStyle(fontSize: 18);
+                        showModalBottomSheet(
+                            backgroundColor: Colors.white,
+                            context: context,
+                            builder: (context) => SingleChildScrollView(
+                                  child: Container(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(32.0),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.end,
+                                        children: [
+                                          Center(
+                                            child: Text(
+                                              'تطبيق محفظتي',
+                                              textDirection: TextDirection.rtl,
+                                              style: style,
+                                            ),
+                                          ),
+                                          Text(
+                                            'يحفظ لك جميع فواتيرك ومشترياتك عن طريق تصوير الفاتورة وادخال اسم المتجر والسعر الاجمالي للفاتورة',
+                                            textDirection: TextDirection.rtl,
+                                            style: style,
+                                          ),
+                                          Text(
+                                            'يسمح لك التطبيق بمشاركة فواتيرك و مشترياتك مع الاصدقاء والأهل',
+                                            textDirection: TextDirection.rtl,
+                                            style: style,
+                                          ),
+                                          Center(
+                                            child: Text(
+                                              'القائمة الجانبية',
+                                              textDirection: TextDirection.rtl,
+                                              style: style,
+                                            ),
+                                          ),
+                                          Text(
+                                            'عرض رقمك الخاص الذي يسمح لأصدقائك بالاطلاع على فواتيرك',
+                                            textDirection: TextDirection.rtl,
+                                            style: style,
+                                          ),
+                                          Text(
+                                            'إظافة صديق عن طريق رقمه الظاهر في تطبيقه الخاص لإظافته في قائمتك والإطلاع على فواتيره بشكل مستمر',
+                                            textDirection: TextDirection.rtl,
+                                            style: style,
+                                          ),
+                                        ],
                                       ),
                                     ),
-                                  ));
-                        }
-                      },
-                      title: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          i == 3
-                              ? SizedBox(
-                                  height: MediaQuery.of(context).size.height,
-                                )
-                              : Container(),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text(
-                              services[i],
-                              textDirection: TextDirection.rtl,
-                              style: TextStyle(fontSize: 22),
-                            ),
+                                  ),
+                                ));
+                      }
+                    },
+                    title: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            services[i],
+                            textDirection: TextDirection.rtl,
+                            style: TextStyle(fontSize: 22),
                           ),
-                          Icon(
-                            i == 0
-                                ? Icons.swap_horiz
-                                : i == 1
-                                    ? Icons.add
-                                    : i == 2
-                                        ? Icons.list
-                                        : Icons.tablet_android,
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                ),
+                        ),
+                        Icon(
+                          i == 0
+                              ? Icons.swap_horiz
+                              : i == 1
+                                  ? Icons.add
+                                  : i == 2 ? Icons.list : Icons.tablet_android,
+                        ),
+                      ],
+                    ),
+                  );
+                },
               ),
             ),
           ],
@@ -460,7 +446,7 @@ class _StoresScreenState extends State<StoresScreen> {
         ],
       ),
       body: Container(
-        color: Colors.green[50],
+        color: Colors.white,
         child: Column(
           children: [
             widget.dataMap.isEmpty
@@ -539,16 +525,15 @@ class _StoresScreenState extends State<StoresScreen> {
                                       stores[i].store,
                                       textDirection: TextDirection.rtl,
                                       textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 18),
+                                      style:
+                                          Theme.of(context).textTheme.headline2,
                                     ),
                                   ),
                                 ),
                                 Text(
                                   "الفواتير ${map[stores[i].store]}",
                                   textDirection: TextDirection.rtl,
+                                  style: Theme.of(context).textTheme.headline3,
                                 )
                               ],
                             ),

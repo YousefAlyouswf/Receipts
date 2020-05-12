@@ -19,11 +19,19 @@ class MyApp extends StatelessWidget {
       ],
       title: 'Flutter Demo',
       theme: ThemeData(
-        primaryColor: Colors.green[800],
+        primaryColor: Colors.blueGrey,
+        textTheme: TextTheme(
+          headline1: TextStyle(color: Colors.black, fontSize: 22),
+          headline2: TextStyle(
+              color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold),
+          headline3: TextStyle(color: Colors.black, fontSize: 15),
+        ),
         colorScheme: ColorScheme.light(primary: const Color(0xFF006700)),
         buttonTheme: ButtonThemeData(textTheme: ButtonTextTheme.primary),
-        floatingActionButtonTheme:
-            FloatingActionButtonThemeData(backgroundColor: Colors.green),
+        floatingActionButtonTheme: FloatingActionButtonThemeData(
+          backgroundColor: Colors.orange,
+          foregroundColor: Colors.white,
+        ),
       ),
       home: Loaded(),
     );

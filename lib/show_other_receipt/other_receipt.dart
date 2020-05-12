@@ -89,6 +89,7 @@ class _OtherReceiptState extends State<OtherReceipt> {
       appBar: AppBar(
         title: Text(
           "${widget.storeName} ($sumPrice ريال) ",
+          style: Theme.of(context).textTheme.headline1,
         ),
         centerTitle: true,
       ),
@@ -124,12 +125,16 @@ class _OtherReceiptState extends State<OtherReceipt> {
                             ? 'لم يتم أختيار التاريخ'
                             : '$_datePicked',
                         textDirection: TextDirection.rtl,
+                        style: Theme.of(context).textTheme.headline3,
                       ),
                     ),
                     FlatButton.icon(
                       onPressed: _presentDatePicker,
                       icon: Icon(Icons.calendar_today),
-                      label: Text('التاريخ'),
+                      label: Text(
+                        'التاريخ',
+                        style: Theme.of(context).textTheme.headline3,
+                      ),
                     ),
                   ],
                 ),

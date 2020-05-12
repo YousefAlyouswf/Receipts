@@ -131,6 +131,7 @@ class _ShowReceiptsState extends State<ShowReceipts> {
         appBar: AppBar(
           title: Text(
             "محفظة ${widget.name}",
+            style: Theme.of(context).textTheme.headline1,
             textDirection: TextDirection.rtl,
           ),
           centerTitle: true,
@@ -179,10 +180,7 @@ class _ShowReceiptsState extends State<ShowReceipts> {
                           receipts[i].store,
                           textDirection: TextDirection.rtl,
                           textAlign: TextAlign.center,
-                          style: TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18),
+                      style: Theme.of(context).textTheme.headline2,
                         ),
                       ),
                     ),
@@ -192,6 +190,7 @@ class _ShowReceiptsState extends State<ShowReceipts> {
                     Text(
                       "الفواتير ${map[receipts[i].store]}",
                       textDirection: TextDirection.rtl,
+                       style: Theme.of(context).textTheme.headline3,
                     )
                   ],
                 ),

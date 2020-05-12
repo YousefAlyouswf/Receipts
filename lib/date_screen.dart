@@ -139,14 +139,7 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
     });
   }
 
-  getSnackBar() {
-    if (selectedList.length > 0) {
-      _scaffoldKey.currentState.showSnackBar(SnackBar(
-        content: Text('Assign a GlobalKey to the Scaffold'),
-        duration: Duration(days: 365),
-      ));
-    } else {}
-  }
+
 
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   @override
@@ -167,6 +160,7 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
         );
       },
       child: Scaffold(
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
         floatingActionButton: FloatingActionButton(
           onPressed: () {
             Navigator.push(
@@ -184,12 +178,13 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
         appBar: AppBar(
           title: Text(
             "${widget.storeName} ($sumPrice ريال) ",
+            style: Theme.of(context).textTheme.headline1,
             textDirection: TextDirection.rtl,
           ),
           centerTitle: true,
         ),
         body: Container(
-          color: Colors.green[50],
+          color: Colors.white,
           child: Column(
             children: [
               Padding(
@@ -199,6 +194,7 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
                   width: double.infinity,
                   //height: MediaQuery.of(context).size.height * 0.05,
                   child: Card(
+                    shadowColor: Theme.of(context).primaryColor,
                     elevation: 10,
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -224,12 +220,16 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
                                 ? 'لم يتم أختيار التاريخ'
                                 : '$_datePicked',
                             textDirection: TextDirection.rtl,
+                            style: Theme.of(context).textTheme.headline3,
                           ),
                         ),
                         FlatButton.icon(
                           onPressed: _presentDatePicker,
                           icon: Icon(Icons.calendar_today),
-                          label: Text('التاريخ'),
+                          label: Text(
+                            'التاريخ',
+                            style: Theme.of(context).textTheme.headline3,
+                          ),
                         ),
                       ],
                     ),
@@ -247,12 +247,6 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
                   itemBuilder: (context, i) {
                     return Container(
                       margin: EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: Colors.grey,
-                          width: 1,
-                        ),
-                      ),
                       child: GridItem(
                         openImage: openImage,
                         item: itemList[i],
@@ -325,86 +319,100 @@ class _GridItemState extends State<GridItem> {
   bool isSelected = false;
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        widget.openImage(widget.item.image);
-      },
-      onLongPress: () {
-        setState(() {
-          isSelected = !isSelected;
-          widget.isSelected(isSelected);
-        });
-      },
-      child: Stack(
-        children: <Widget>[
-          Column(
-            children: [
-              Expanded(
-                child: Container(
-                  child: Image.file(
-                    widget.item.image,
-                    fit: BoxFit.fill,
-                    width: double.infinity,
-                    color: Colors.black.withOpacity(isSelected ? 1 : 0),
-                    colorBlendMode: BlendMode.color,
-                  ),
-                ),
-              ),
-              Container(
-                width: double.infinity,
-                child: Column(
-                  children: [
-                    Text(
-                      " ${widget.item.price} ريال",
-                      textDirection: TextDirection.rtl,
-                    ),
-                    Text(widget.item.date),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          Align(
-            alignment: Alignment.bottomLeft,
-            child: IconButton(
-              icon: Icon(
-                Icons.edit,
-                color: Colors.blue,
-              ),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => AddNewReceipt(
-                      storeName: widget.item.store,
-                      price: widget.item.price,
-                      date: widget.item.date,
-                      image: widget.item.image,
-                      itemID: widget.item.itemID,
+    return Container(
+      decoration: new BoxDecoration(
+        color: Theme.of(context).primaryColor,
+        borderRadius: new BorderRadius.all(Radius.circular(10)),
+      ),
+      child: InkWell(
+        onTap: () {
+          widget.openImage(widget.item.image);
+        },
+        onLongPress: () {
+          setState(() {
+            isSelected = !isSelected;
+            widget.isSelected(isSelected);
+          });
+        },
+        child: Stack(
+          children: <Widget>[
+            Column(
+              children: [
+                Expanded(
+                  child: Container(
+                    child: Image.file(
+                      widget.item.image,
+                      fit: BoxFit.fill,
+                      width: double.infinity,
+                      color: Colors.black.withOpacity(isSelected ? 1 : 0),
+                      colorBlendMode: BlendMode.color,
                     ),
                   ),
-                );
-              },
+                ),
+                Container(
+                  width: double.infinity,
+                  child: Column(
+                    children: [
+                      Text(
+                        " ${widget.item.price} ريال",
+                        textDirection: TextDirection.rtl,
+                            style: Theme.of(context).textTheme.headline3,
+                      ),
+                      Center(
+                        child: Text(
+                          widget.item.date,
+                          textDirection: TextDirection.rtl,
+                             style: Theme.of(context).textTheme.headline3,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-          ),
-          isSelected
-              ? Align(
-                  alignment: Alignment.bottomRight,
-                  child: IconButton(
-                    icon: Icon(
-                      Icons.check_circle,
+            Align(
+              alignment: Alignment.bottomLeft,
+              child: IconButton(
+                icon: Icon(
+                  Icons.edit,
+                  color: Colors.white,
+                ),
+                onPressed: () {
+                  print(widget.item.itemID);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AddNewReceipt(
+                        storeName: widget.item.store,
+                        price: widget.item.price,
+                        date: widget.item.date,
+                        image: widget.item.image,
+                        itemID: widget.item.itemID,
+                      ),
                     ),
-                    color: Colors.red,
-                    onPressed: () {
-                      setState(() {
-                        isSelected = !isSelected;
-                        widget.isSelected(isSelected);
-                      });
-                    },
-                  ),
-                )
-              : Container()
-        ],
+                  );
+                },
+              ),
+            ),
+            isSelected
+                ? Align(
+                    alignment: Alignment.bottomRight,
+                    child: IconButton(
+                      icon: Icon(
+                        Icons.check_circle,
+                      ),
+                      color: Colors.red,
+                      onPressed: () {
+                        setState(() {
+                          isSelected = !isSelected;
+                          widget.isSelected(isSelected);
+                        });
+                      },
+                    ),
+                  )
+                : Container()
+          ],
+        ),
       ),
     );
   }

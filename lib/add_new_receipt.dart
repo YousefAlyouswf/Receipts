@@ -8,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:receipt/loaded.dart';
 import 'database/db_helper.dart';
 import 'package:autocomplete_textfield/autocomplete_textfield.dart';
+import 'date_screen.dart';
 import 'models/receipt_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:uuid/uuid.dart';
@@ -107,6 +108,7 @@ class _AddNewReceiptState extends State<AddNewReceipt> {
       isEdited = true;
     } else if (widget.storeName != null) {
       controllerName.text = widget.storeName;
+      itemID = uuid.v1();
     } else {
       itemID = uuid.v1();
     }
@@ -141,7 +143,7 @@ class _AddNewReceiptState extends State<AddNewReceipt> {
     return Scaffold(
       resizeToAvoidBottomPadding: false,
       appBar: AppBar(
-        title: Text("أدخل الفاتورة"),
+        title: Text("أدخل الفاتورة",style: Theme.of(context).textTheme.headline1,),
         centerTitle: true,
       ),
       floatingActionButton: Row(
@@ -268,7 +270,7 @@ class _AddNewReceiptState extends State<AddNewReceipt> {
                                         itemID);
                                   } else {
                                     currentTimeInSeconds();
-
+                                    print("---------------->>>>> $itemID");
                                     getDate().then((date) async {
                                       DBHelper.insert(
                                         'receipts',
@@ -293,7 +295,7 @@ class _AddNewReceiptState extends State<AddNewReceipt> {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => Loaded(),
+                                      builder: (context) => ReceiptScreen(storeName:controllerName.text ,),
                                     ),
                                   );
                                   Fluttertoast.showToast(
@@ -301,26 +303,30 @@ class _AddNewReceiptState extends State<AddNewReceipt> {
                                       toastLength: Toast.LENGTH_SHORT,
                                       gravity: ToastGravity.BOTTOM,
                                       timeInSecForIosWeb: 1,
-                                      backgroundColor: Colors.green,
+                                      backgroundColor:
+                                          Theme.of(context).primaryColor,
                                       textColor: Colors.white,
                                       fontSize: 16.0);
                                 }
                               },
-                              child: Container(
-                                decoration: new BoxDecoration(
-                                  color: Colors.green[800],
-                                  borderRadius:
-                                      new BorderRadius.all(Radius.circular(10)),
-                                ),
-                                width: MediaQuery.of(context).size.width / 2,
-                                height:
-                                    MediaQuery.of(context).size.height * 0.07,
-                                child: Center(
-                                  child: Text(
-                                    'تخزين',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 24,
+                              child: Padding(
+                                padding: const EdgeInsets.only(top: 24.0),
+                                child: Container(
+                                  decoration: new BoxDecoration(
+                                    color: Theme.of(context).primaryColor,
+                                    borderRadius: new BorderRadius.all(
+                                        Radius.circular(10)),
+                                  ),
+                                  width: MediaQuery.of(context).size.width / 2,
+                                  height:
+                                      MediaQuery.of(context).size.height * 0.07,
+                                  child: Center(
+                                    child: Text(
+                                      'تخزين',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 24,
+                                      ),
                                     ),
                                   ),
                                 ),
