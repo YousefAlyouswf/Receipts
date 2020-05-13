@@ -39,6 +39,7 @@ class _StoresScreenState extends State<StoresScreen> {
     });
   }
 
+  bool isPressed = false;
   List<ReceiptModel> receiptCount = [];
   Future<void> countTheReceipts() async {
     final storeList = await DBHelper.receiptCount('receipts');
@@ -82,12 +83,13 @@ class _StoresScreenState extends State<StoresScreen> {
       Color(0xFF69015A),
       Color(0xFF3E7927),
       Color(0xFF8F0407),
-      Color(0xFF006C3B),
+      Color(0xFFb3b300),
       Color(0xFF972D1D),
       Color(0xFF006E6F),
       Color(0xFF994F06),
       Color(0xFF013D73),
       Color(0xFF9B6701),
+      Color(0xFF006C3B),
       Color(0xFF081C63),
       Color(0xFFA19600),
       Color(0xFF38085C),
@@ -203,6 +205,139 @@ class _StoresScreenState extends State<StoresScreen> {
     );
   }
 
+  void freindsFunction() async {
+    List<Friends> frindes = [];
+    final storeList = await DBHelper.getDataFriend('friend');
+    setState(() {
+      frindes = storeList
+          .map(
+            (item) => Friends(
+              id: item['id'],
+              name: item['name'],
+              code: item['code'],
+            ),
+          )
+          .toList();
+    });
+    showModalBottomSheet(
+        isDismissible: true,
+        elevation: 0,
+        enableDrag: true,
+        backgroundColor: Colors.white,
+        context: context,
+        builder: (context) => frindes.length == 0
+            ? Center(
+                child: Text(
+                  "لا يوجد أصدقاء",
+                  style: TextStyle(fontSize: 24, color: Colors.black),
+                ),
+              )
+            : StatefulBuilder(builder: (BuildContext context,
+                StateSetter setState /*You can rename this!*/) {
+                return Padding(
+                  padding: const EdgeInsets.only(left: 50.0, right: 50.0),
+                  child: isPressed
+                        ? Container(
+                          child: Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                SizedBox(
+                                    child: CircularProgressIndicator(),
+                                    height: 100.0,
+                                    width: 100.0,
+                                  ),
+                                  Text("جاري جلب البيانات")
+                              ],
+                            ),
+                          ),
+                        )
+                        :  ListView.builder(
+                          itemCount: frindes.length,
+                          itemBuilder: (ctx, index) {
+                            return Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Card(
+                                color: Colors.blueGrey,
+                                child: ListTile(
+                                  title: Text(
+                                    frindes[index].name,
+                                    textDirection: TextDirection.rtl,
+                                    style: TextStyle(
+                                      fontSize: 24,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  subtitle: Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      IconButton(
+                                        onPressed: () {
+                                          Clipboard.setData(new ClipboardData(
+                                              text: frindes[index].code));
+
+                                          Fluttertoast.showToast(
+                                              msg: "تم النسخ",
+                                              toastLength: Toast.LENGTH_SHORT,
+                                              gravity: ToastGravity.BOTTOM,
+                                              timeInSecForIosWeb: 1,
+                                              backgroundColor: Colors.grey,
+                                              textColor: Colors.white,
+                                              fontSize: 16.0);
+                                        },
+                                        icon: Icon(
+                                          Icons.content_copy,
+                                          color: Colors.white,
+                                          size: 15,
+                                        ),
+                                      ),
+                                      Text(
+                                        frindes[index].code,
+                                        textDirection: TextDirection.rtl,
+                                        style: TextStyle(
+                                            color: Colors.grey, fontSize: 12),
+                                      ),
+                                    ],
+                                  ),
+                                  leading: IconButton(
+                                    icon: Icon(Icons.delete),
+                                    color: Colors.red,
+                                    onPressed: () async {
+                                      DBHelper.deleteFriend(
+                                        'friend',
+                                        frindes[index].id,
+                                      );
+                                    },
+                                  ),
+                                  onTap: () async {
+                                    setState(() {
+                                      isPressed = true;
+                                    });
+                                    // Navigator.pop(context);
+                                    await fetchintoMap(
+                                        frindes[index].code, context);
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => ShowReceipts(
+                                          saved: true,
+                                          textCode: frindes[index].code,
+                                          name: frindes[index].name,
+                                          dataMap: dataMap,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                );
+              }));
+  }
+
   List<String> services = [
     'إظافة صديق',
     'قائمة الأصدقاء',
@@ -271,94 +406,7 @@ class _StoresScreenState extends State<StoresScreen> {
                         _showDialog(i);
                       } else if (i == 1) {
                         Navigator.of(context).pop();
-                        List<Friends> frindes = [];
-                        final storeList =
-                            await DBHelper.getDataFriend('friend');
-                        setState(() {
-                          frindes = storeList
-                              .map(
-                                (item) => Friends(
-                                  id: item['id'],
-                                  name: item['name'],
-                                  code: item['code'],
-                                ),
-                              )
-                              .toList();
-                        });
-                        showModalBottomSheet(
-                          backgroundColor: Colors.white,
-                          context: context,
-                          builder: (context) => frindes.length == 0
-                              ? Center(
-                                  child: Text(
-                                    "لا يوجد أصدقاء",
-                                    style: TextStyle(
-                                        fontSize: 24, color: Colors.black),
-                                  ),
-                                )
-                              : Container(
-                                  color: Colors.white,
-                                  height: MediaQuery.of(context).size.height,
-                                  width: MediaQuery.of(context).size.width,
-                                  child: ListView.builder(
-                                    itemCount: frindes.length,
-                                    itemBuilder: (ctx, index) {
-                                      return Padding(
-                                        padding: const EdgeInsets.all(32.0),
-                                        child: Card(
-                                          child: ListTile(
-                                            title: Text(
-                                              frindes[index].name,
-                                              textDirection: TextDirection.rtl,
-                                              style: TextStyle(
-                                                fontSize: 24,
-                                                color: Colors.black,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                            subtitle: Text(
-                                              frindes[index].code,
-                                              textDirection: TextDirection.rtl,
-                                              style: TextStyle(
-                                                  color: Colors.grey,
-                                                  fontSize: 12),
-                                            ),
-                                            leading: IconButton(
-                                              icon: Icon(Icons.delete),
-                                              color: Colors.red,
-                                              onPressed: () async {
-                                                DBHelper.deleteFriend(
-                                                  'friend',
-                                                  frindes[index].id,
-                                                );
-                                              },
-                                            ),
-                                            onTap: () async {
-                                              print("Start----------------------");
-                                              await fetchintoMap(
-                                                  frindes[index].code);
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      ShowReceipts(
-                                                    saved: true,
-                                                    textCode:
-                                                        frindes[index].code,
-                                                    name: frindes[index].name,
-                                                    dataMap: dataMap,
-                                                  ),
-                                                ),
-                                              );
-                                              print("END----------------------");
-                                            },
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ),
-                        );
+                        freindsFunction();
                       } else if (i == 2) {
                         TextStyle style = TextStyle(fontSize: 18);
                         showModalBottomSheet(
@@ -465,12 +513,21 @@ class _StoresScreenState extends State<StoresScreen> {
                             dataMap: widget.dataMap,
                             colorList: colorList,
                             showLegends: true,
+                            chartValueStyle: TextStyle(color: Colors.white),
                           ),
                         ),
                 );
               },
               child: Icon(Icons.pie_chart),
             ),
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          FloatingActionButton(
+            heroTag: "btn3",
+            onPressed: freindsFunction,
+            child: Icon(Icons.people),
           ),
           SizedBox(
             height: 10,
@@ -521,69 +578,71 @@ class _StoresScreenState extends State<StoresScreen> {
                   )
                 : Expanded(
                     child: GridView.builder(
-                      itemCount: allItems.length,
-                      gridDelegate:
-                          new SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 3),
-                      itemBuilder: (context, i) {
-                        return Container(
-                          decoration: new BoxDecoration(
-                            borderRadius:
-                                new BorderRadius.all(Radius.circular(15)),
-                            image: DecorationImage(
-                                colorFilter: ColorFilter.mode(
-                                    colorList[i], BlendMode.srcATop),
-                                image: AssetImage(
-                                  'assets/images/wallet.png',
+                            itemCount: allItems.length,
+                            gridDelegate:
+                                new SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 3),
+                            itemBuilder: (context, i) {
+                              return Container(
+                                decoration: new BoxDecoration(
+                                  borderRadius:
+                                      new BorderRadius.all(Radius.circular(15)),
+                                  image: DecorationImage(
+                                      colorFilter: ColorFilter.mode(
+                                          colorList[i], BlendMode.srcATop),
+                                      image: AssetImage(
+                                        'assets/images/wallet.png',
+                                      ),
+                                      fit: BoxFit.fitHeight),
                                 ),
-                                fit: BoxFit.fitHeight),
-                          ),
-                          margin: EdgeInsets.all(10),
-                          child: InkWell(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => ReceiptScreen(
-                                    storeName: allItems[i].storeName,
-                                    color: colorList[i],
+                                margin: EdgeInsets.all(10),
+                                child: InkWell(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => ReceiptScreen(
+                                          storeName: allItems[i].storeName,
+                                          color: colorList[i],
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  child: Column(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceAround,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      SizedBox(),
+                                      FittedBox(
+                                        fit: BoxFit.contain,
+                                        child: Text(
+                                          allItems[i].storeName,
+                                          textDirection: TextDirection.rtl,
+                                          textAlign: TextAlign.center,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .headline2
+                                              .copyWith(
+                                                color: colorList[i],
+                                              ),
+                                        ),
+                                      ),
+                                      Text(
+                                        "(${allItems[i].count})",
+                                        textDirection: TextDirection.rtl,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .headline3
+                                            .copyWith(color: colorList[i]),
+                                      )
+                                    ],
                                   ),
                                 ),
                               );
                             },
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                SizedBox(),
-                                FittedBox(
-                                  fit: BoxFit.contain,
-                                  child: Text(
-                                    allItems[i].storeName,
-                                    textDirection: TextDirection.rtl,
-                                    textAlign: TextAlign.center,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .headline2
-                                        .copyWith(
-                                          color: colorList[i],
-                                        ),
-                                  ),
-                                ),
-                                Text(
-                                  "(${allItems[i].count})",
-                                  textDirection: TextDirection.rtl,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .headline3
-                                      .copyWith(color: colorList[i]),
-                                )
-                              ],
-                            ),
                           ),
-                        );
-                      },
-                    ),
                   ),
           ],
         ),
@@ -595,7 +654,7 @@ class _StoresScreenState extends State<StoresScreen> {
 
   Map<String, double> dataMap;
 
-  Future<void> fetchintoMap(String userid) async {
+  Future<void> fetchintoMap(String userid, BuildContext ctx) async {
     String url = "https://receipt-49fc2.firebaseio.com/$userid.json";
     final responce = await http.get(url);
     final data = json.decode(responce.body) as Map<String, dynamic>;
@@ -606,6 +665,7 @@ class _StoresScreenState extends State<StoresScreen> {
 
     List<ReceiptModel> toGetAllPrice = [];
     storesForMap = [];
+
     for (var i = 0; i < storesFromFirebase.length; i++) {
       String url1 =
           "https://receipt-49fc2.firebaseio.com/$userid/${storesFromFirebase[i]}.json";
