@@ -334,6 +334,7 @@ class _StoresScreenState extends State<StoresScreen> {
                                               },
                                             ),
                                             onTap: () async {
+                                              print("Start----------------------");
                                               await fetchintoMap(
                                                   frindes[index].code);
                                               Navigator.push(
@@ -349,7 +350,7 @@ class _StoresScreenState extends State<StoresScreen> {
                                                   ),
                                                 ),
                                               );
-                                              print(dataMap);
+                                              print("END----------------------");
                                             },
                                           ),
                                         ),

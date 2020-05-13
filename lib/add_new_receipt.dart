@@ -22,6 +22,7 @@ class AddNewReceipt extends StatefulWidget {
   final File image;
   final String itemID;
   final Color color;
+  final int dateTime;
 
   const AddNewReceipt(
       {Key key,
@@ -30,7 +31,8 @@ class AddNewReceipt extends StatefulWidget {
       this.image,
       this.date,
       this.itemID,
-      this.color})
+      this.color,
+      this.dateTime})
       : super(key: key);
 
   @override
@@ -40,7 +42,7 @@ class AddNewReceipt extends StatefulWidget {
 class _AddNewReceiptState extends State<AddNewReceipt> {
   var uuid = Uuid();
   String itemID;
-  GlobalKey<AutoCompleteTextFieldState<String>> key = new GlobalKey();
+  GlobalKey<AutoCompleteTextFieldState<String>> keyX = new GlobalKey();
   File imageStored;
   String urlImage;
   TextEditingController controllerName = TextEditingController();
@@ -113,6 +115,7 @@ class _AddNewReceiptState extends State<AddNewReceipt> {
       controllerPrice.text = widget.price;
       itemID = widget.itemID;
       isEdited = true;
+      _dateTimePicked = widget.dateTime;
     } else if (widget.storeName != null) {
       controllerName.text = widget.storeName;
       itemID = uuid.v1();
@@ -220,7 +223,7 @@ class _AddNewReceiptState extends State<AddNewReceipt> {
                                     width:
                                         MediaQuery.of(context).size.width / 3,
                                     child: SimpleAutoCompleteTextField(
-                                      key: key,
+                                      key: keyX,
                                       controller: controllerName,
                                       suggestions: stores,
                                       decoration: InputDecoration(
@@ -392,14 +395,41 @@ class _AddNewReceiptState extends State<AddNewReceipt> {
 
     if (urlImage.isNotEmpty) {
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      getDate().then((date) {
-        if (prefs.getString('uuid') == null || prefs.getString('uuid') == '') {
-          prefs.setString('uuid', uuid.v1());
+      getDate().then((date) async {
+        if (isEdited) {
+          print('--->>>>>>$_dateTimePicked');
+          //Delete
           String userID = prefs.getString('uuid');
           String url =
+              "https://receipt-49fc2.firebaseio.com/$userID/${widget.storeName}.json";
+          final responce = await http.get(url);
+          final data = json.decode(responce.body) as Map<String, dynamic>;
+          List<ReceiptModel> testModel = [];
+          data.forEach((key, value) {
+            if (value['id'] == widget.itemID) {
+              testModel.add(ReceiptModel(
+                key: key,
+                price: value['price'],
+                date: value['date'],
+                itemID: value['id'],
+              ));
+            }
+          });
+          String key = testModel[0].key;
+
+          String urlForDelete =
+              "https://receipt-49fc2.firebaseio.com/$userID/${widget.storeName}/$key.json";
+          await http.delete(
+            urlForDelete,
+            headers: <String, String>{
+              'Content-Type': 'application/json; charset=UTF-8',
+            },
+          );
+          //End delete
+          String urlPost =
               "https://receipt-49fc2.firebaseio.com/$userID/${controllerName.text}.json";
           http.post(
-            url,
+            urlPost,
             body: json.encode(
               {
                 'store': controllerName.text,
@@ -414,24 +444,47 @@ class _AddNewReceiptState extends State<AddNewReceipt> {
             ),
           );
         } else {
-          String userID = prefs.getString('uuid');
-          String url =
-              "https://receipt-49fc2.firebaseio.com/$userID/${controllerName.text}.json";
-          http.post(
-            url,
-            body: json.encode(
-              {
-                'store': controllerName.text,
-                'price': controllerPrice.text,
-                'image': urlImage,
-                'date': _datePicked == null ? date : _datePicked,
-                'id': itemID,
-                'dateTime': _dateTimePicked == null
-                    ? currentTimeInSeconds()
-                    : _dateTimePicked,
-              },
-            ),
-          );
+          if (prefs.getString('uuid') == null ||
+              prefs.getString('uuid') == '') {
+            prefs.setString('uuid', uuid.v1());
+            String userID = prefs.getString('uuid');
+            String url =
+                "https://receipt-49fc2.firebaseio.com/$userID/${controllerName.text}.json";
+            http.post(
+              url,
+              body: json.encode(
+                {
+                  'store': controllerName.text,
+                  'price': controllerPrice.text,
+                  'image': urlImage,
+                  'date': _datePicked == null ? date : _datePicked,
+                  'id': itemID,
+                  'dateTime': _dateTimePicked == null
+                      ? currentTimeInSeconds()
+                      : _dateTimePicked,
+                },
+              ),
+            );
+          } else {
+            String userID = prefs.getString('uuid');
+            String url =
+                "https://receipt-49fc2.firebaseio.com/$userID/${controllerName.text}.json";
+            http.post(
+              url,
+              body: json.encode(
+                {
+                  'store': controllerName.text,
+                  'price': controllerPrice.text,
+                  'image': urlImage,
+                  'date': _datePicked == null ? date : _datePicked,
+                  'id': itemID,
+                  'dateTime': _dateTimePicked == null
+                      ? currentTimeInSeconds()
+                      : _dateTimePicked,
+                },
+              ),
+            );
+          }
         }
       });
     }

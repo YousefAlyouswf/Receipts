@@ -134,6 +134,7 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
           itemID: receipts[index].itemID,
           id: receipts[index].id,
           selectID: index + 1,
+          dateTime: receipts[index].dateTime,
         ),
       );
     });
@@ -393,6 +394,7 @@ class _GridItemState extends State<GridItem> {
                         image: widget.item.image,
                         itemID: widget.item.itemID,
                         color: widget.color,
+                        dateTime: widget.item.dateTime,
                       ),
                     ),
                   );
