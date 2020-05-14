@@ -258,14 +258,14 @@ class _StoresScreenState extends State<StoresScreen> {
                             return Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Card(
-                                color: Colors.blueGrey,
+                                color: Colors.white54,
                                 child: ListTile(
                                   title: Text(
                                     frindes[index].name,
                                     textDirection: TextDirection.rtl,
                                     style: TextStyle(
                                       fontSize: 24,
-                                      color: Colors.white,
+                                      color: Colors.black,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),

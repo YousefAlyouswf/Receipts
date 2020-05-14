@@ -3,9 +3,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:receipt/database/db_helper.dart';
 import 'package:receipt/models/receipt_model.dart';
+import 'package:receipt/widgets/grid_view_date_screen.dart';
+import 'package:receipt/widgets/pick_date.dart';
 import 'add_new_receipt.dart';
 import 'loaded.dart';
-import 'package:photo_view/photo_view.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -21,7 +22,8 @@ class ReceiptScreen extends StatefulWidget {
 class _ReceiptScreenState extends State<ReceiptScreen> {
   List<ReceiptModel> receipts = [];
   double sumPrice = 0;
-  Future<void> fetchReceipts() async {
+  String _datePicked;
+  Future<void> fetchReceipts(String _datePicked) async {
     final dataList =
         await DBHelper.getData('receipts', widget.storeName, _datePicked);
     setState(() {
@@ -45,22 +47,6 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
       sumPrice += double.parse(receipts[i].price);
     }
     loadList();
-  }
-
-  void openImage(File image) {
-    showModalBottomSheet(
-      isScrollControlled: true,
-      isDismissible: true,
-      elevation: 0,
-      enableDrag: true,
-      barrierColor: Colors.white,
-      context: context,
-      builder: (context) => PhotoView(
-        imageProvider: FileImage(
-          image,
-        ),
-      ),
-    );
   }
 
   Future<void> deleteFromFirebase(String itemID) async {
@@ -95,28 +81,6 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
     }
   }
 
-  String _datePicked;
-  void _presentDatePicker() {
-    showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2018),
-      lastDate: DateTime.now(),
-      cancelText: "إلغاء",
-      confirmText: "تم",
-      locale: Locale('ar', 'SA'),
-    ).then((date) {
-      if (date == null) {
-        return;
-      } else {
-        setState(() {
-          _datePicked = "${date.day}/${date.month}/${date.year}";
-        });
-        fetchReceipts();
-      }
-    });
-  }
-
   List<ReceiptModel> itemList = [];
   List<ReceiptModel> selectedList = [];
   bool isSelected = false;
@@ -144,7 +108,14 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
   @override
   void initState() {
     super.initState();
-    fetchReceipts();
+    fetchReceipts(_datePicked);
+  }
+
+  bool presstheSelect = false;
+  void pressToSelect() {
+    setState(() {
+      presstheSelect = !presstheSelect;
+    });
   }
 
   @override
@@ -159,9 +130,7 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
         );
       },
       child: Scaffold(
-        floatingActionButtonLocation: selectedList.length == 0
-            ? FloatingActionButtonLocation.centerFloat
-            : FloatingActionButtonLocation.startFloat,
+        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
         floatingActionButton: FloatingActionButton(
           onPressed: () {
             Navigator.push(
@@ -185,240 +154,32 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
             textDirection: TextDirection.rtl,
           ),
           centerTitle: true,
+          actions: [
+            FlatButton(
+              onPressed: pressToSelect,
+              child: presstheSelect?
+              Text(
+                'إلغاء',
+                style:
+                    TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              )
+              : Text(
+                'تحديد',
+                style:
+                    TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              ),
+            )
+          ],
         ),
         body: Container(
           color: Colors.white,
           child: Column(
             children: [
-              Padding(
-                padding: const EdgeInsets.only(
-                    top: 16.0, bottom: 16.0, left: 32, right: 32),
-                child: Container(
-                  width: double.infinity,
-                  //height: MediaQuery.of(context).size.height * 0.05,
-                  child: Card(
-                    shadowColor: Theme.of(context).primaryColor,
-                    color: widget.color.withOpacity(0.3),
-                    elevation: 10,
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        _datePicked == null
-                            ? Container()
-                            : IconButton(
-                                icon: Icon(
-                                  Icons.cancel,
-                                  color: Colors.black,
-                                ),
-                                onPressed: () {
-                                  setState(() {
-                                    _datePicked = null;
-                                  });
-                                  fetchReceipts();
-                                },
-                              ),
-                        Center(
-                          child: Text(
-                            _datePicked == null
-                                ? 'أختر التاريخ لفرز الفواتير'
-                                : '$_datePicked',
-                            textDirection: TextDirection.rtl,
-                            style: Theme.of(context).textTheme.headline3,
-                          ),
-                        ),
-                        FlatButton.icon(
-                          onPressed: _presentDatePicker,
-                          icon: Icon(Icons.calendar_today),
-                          label: Text(
-                            'التاريخ',
-                            style: Theme.of(context).textTheme.headline3,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              Expanded(
-                child: GridView.builder(
-                  physics: ClampingScrollPhysics(),
-                  shrinkWrap: true,
-                  itemCount: itemList.length,
-                  gridDelegate: new SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                  ),
-                  itemBuilder: (context, i) {
-                    return Container(
-                      margin: EdgeInsets.all(10),
-                      child: GridItem(
-                        color: widget.color,
-                        openImage: openImage,
-                        item: itemList[i],
-                        isSelected: (bool value) {
-                          setState(() {
-                            if (value) {
-                              selectedList.add(itemList[i]);
-                            } else {
-                              selectedList.remove(itemList[i]);
-                            }
-                          });
-                        },
-                        key: Key(
-                          itemList[i].id.toString(),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-              selectedList.length > 0
-                  ? Container(
-                      width: double.infinity,
-                      height: MediaQuery.of(context).size.height * 0.08,
-                      color: Colors.red,
-                      child: IconButton(
-                          icon: Icon(
-                            Icons.delete_forever,
-                            size: MediaQuery.of(context).size.height * 0.05,
-                            color: Colors.white,
-                          ),
-                          onPressed: () async {
-                            for (var i = 0; i < selectedList.length; i++) {
-                              deleteFromFirebase(selectedList[i].itemID);
-                              DBHelper.deleteItem(
-                                  'receipts', selectedList[i].id);
-                            }
-                            await fetchReceipts();
-                            if (receipts.length == 0) {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => Loaded(),
-                                ),
-                              );
-                            }
-                          }),
-                    )
-                  : Container(),
+              PickDateWidget(fetchReceipts, widget.color),
+              GridViewDateScreen(itemList, selectedList, widget.color, receipts,
+                  deleteFromFirebase, fetchReceipts, _datePicked, presstheSelect)
             ],
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class GridItem extends StatefulWidget {
-  final Key key;
-  final ReceiptModel item;
-  final ValueChanged<bool> isSelected;
-  final Function openImage;
-  final Color color;
-  GridItem({this.item, this.isSelected, this.key, this.openImage, this.color});
-
-  @override
-  _GridItemState createState() => _GridItemState();
-}
-
-class _GridItemState extends State<GridItem> {
-  bool isSelected = false;
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: new BoxDecoration(
-        color: widget.color.withOpacity(isSelected ? 0.3 : 0.9),
-        borderRadius: new BorderRadius.all(Radius.circular(10)),
-      ),
-      child: InkWell(
-        onTap: () {
-          widget.openImage(widget.item.image);
-        },
-        onLongPress: () {
-          setState(() {
-            isSelected = !isSelected;
-            widget.isSelected(isSelected);
-          });
-        },
-        child: Stack(
-          children: <Widget>[
-            Column(
-              children: [
-                Expanded(
-                  child: Container(
-                    child: Image.file(
-                      widget.item.image,
-                      fit: BoxFit.fill,
-                      width: double.infinity,
-                      colorBlendMode: BlendMode.color,
-                    ),
-                  ),
-                ),
-                Container(
-                  width: double.infinity,
-                  child: Column(
-                    children: [
-                      Text(
-                        " ${widget.item.price} ريال",
-                        textDirection: TextDirection.rtl,
-                        style: Theme.of(context).textTheme.headline3,
-                      ),
-                      Center(
-                        child: Text(
-                          widget.item.date,
-                          textDirection: TextDirection.rtl,
-                          style: Theme.of(context).textTheme.headline3,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            Align(
-              alignment: Alignment.bottomLeft,
-              child: IconButton(
-                icon: Icon(
-                  Icons.edit,
-                  color: Colors.white,
-                ),
-                onPressed: () {
-                  print(widget.color);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => AddNewReceipt(
-                        storeName: widget.item.store,
-                        price: widget.item.price,
-                        date: widget.item.date,
-                        image: widget.item.image,
-                        itemID: widget.item.itemID,
-                        color: widget.color,
-                        dateTime: widget.item.dateTime,
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-            isSelected
-                ? Align(
-                    alignment: Alignment.bottomRight,
-                    child: IconButton(
-                      icon: Icon(
-                        Icons.check_circle,
-                      ),
-                      color: Colors.red,
-                      onPressed: () {
-                        setState(() {
-                          isSelected = !isSelected;
-                          widget.isSelected(isSelected);
-                        });
-                      },
-                    ),
-                  )
-                : Container()
-          ],
         ),
       ),
     );

@@ -192,71 +192,80 @@ class _ShowReceiptsState extends State<ShowReceipts> {
           },
           child: Icon(Icons.pie_chart),
         ),
-        body: GridView.builder(
-          itemCount: allItems.length,
-          gridDelegate:
-              new SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3),
-          itemBuilder: (context, i) {
-            return Container(
-              decoration: new BoxDecoration(
-                borderRadius: new BorderRadius.all(Radius.circular(15)),
-                image: DecorationImage(
-                    colorFilter:
-                        ColorFilter.mode(colorList[i], BlendMode.srcATop),
-                    image: AssetImage(
-                      'assets/images/wallet.png',
+        body: allItems.length < 1
+            ? Center(
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width / 2,
+                  child: LinearProgressIndicator(
+                    minHeight: 15,
+                  ),
+                ),
+              )
+            : GridView.builder(
+                itemCount: allItems.length,
+                gridDelegate: new SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3),
+                itemBuilder: (context, i) {
+                  return Container(
+                    decoration: new BoxDecoration(
+                      borderRadius: new BorderRadius.all(Radius.circular(15)),
+                      image: DecorationImage(
+                          colorFilter:
+                              ColorFilter.mode(colorList[i], BlendMode.srcATop),
+                          image: AssetImage(
+                            'assets/images/wallet.png',
+                          ),
+                          fit: BoxFit.fitHeight),
                     ),
-                    fit: BoxFit.fitHeight),
-              ),
-              margin: EdgeInsets.all(10),
-              child: InkWell(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => OtherReceipt(
-                        storeName: allItems[i].storeName,
-                        textCode: widget.textCode,
-                        color: colorList[i],
+                    margin: EdgeInsets.all(10),
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => OtherReceipt(
+                              storeName: allItems[i].storeName,
+                              textCode: widget.textCode,
+                              color: colorList[i],
+                            ),
+                          ),
+                        );
+                      },
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          SizedBox(),
+                          FittedBox(
+                            fit: BoxFit.contain,
+                            child: Text(
+                              allItems[i].storeName,
+                              textDirection: TextDirection.rtl,
+                              textAlign: TextAlign.center,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headline2
+                                  .copyWith(color: colorList[i]),
+                            ),
+                          ),
+                          allItems[i].count == null
+                              ? CircularProgressIndicator(
+                                  backgroundColor: colorList[i],
+                                )
+                              : Text(
+                                  "(${allItems[i].count})",
+                                  textDirection: TextDirection.rtl,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .headline3
+                                      .copyWith(color: colorList[i]),
+                                )
+                        ],
                       ),
                     ),
                   );
                 },
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    SizedBox(),
-                    FittedBox(
-                      fit: BoxFit.contain,
-                      child: Text(
-                        allItems[i].storeName,
-                        textDirection: TextDirection.rtl,
-                        textAlign: TextAlign.center,
-                        style: Theme.of(context)
-                            .textTheme
-                            .headline2
-                            .copyWith(color: colorList[i]),
-                      ),
-                    ),
-                    allItems[i].count == null
-                        ? CircularProgressIndicator(
-                            backgroundColor: colorList[i],
-                          )
-                        : Text(
-                            "(${allItems[i].count})",
-                            textDirection: TextDirection.rtl,
-                            style: Theme.of(context)
-                                .textTheme
-                                .headline3
-                                .copyWith(color: colorList[i]),
-                          )
-                  ],
-                ),
               ),
-            );
-          },
-        ),
       ),
     );
   }
