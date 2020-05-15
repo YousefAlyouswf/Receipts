@@ -137,7 +137,7 @@ class _OtherReceiptState extends State<OtherReceipt> {
                         : IconButton(
                             icon: Icon(
                               Icons.cancel,
-                              color: Colors.red,
+                              color: Colors.black,
                             ),
                             onPressed: () {
                               setState(() {
