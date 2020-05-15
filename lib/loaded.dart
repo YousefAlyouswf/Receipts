@@ -89,7 +89,6 @@ class _LoadedState extends State<Loaded> {
 
   Widget waitLoaded() {
     if (stores.length > 0) {
-      print('not Empty');
     } else {
       return StoresScreen(
         dataMap: dataMap,
