@@ -342,12 +342,15 @@ class _StoresScreenState extends State<StoresScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomPadding: false,
+      backgroundColor: Theme.of(context).primaryColor,
       appBar: AppBar(
-        title: Text(
-          "محفظتي",
-          style: Theme.of(context).textTheme.headline1,
+        title: Image.asset(
+          'assets/images/wallet-1.png',
+          fit: BoxFit.fitHeight,
+          height: MediaQuery.of(context).size.height * 0.08,
         ),
         centerTitle: true,
+        elevation: 0,
       ),
       endDrawer: Drawer(
         child: Column(
@@ -357,6 +360,7 @@ class _StoresScreenState extends State<StoresScreen> {
             Container(
               height: MediaQuery.of(context).size.height / 6,
               child: UserAccountsDrawerHeader(
+                margin: EdgeInsets.all(0),
                 accountName: Text(''),
                 accountEmail: Padding(
                   padding: const EdgeInsets.all(8.0),
@@ -392,90 +396,109 @@ class _StoresScreenState extends State<StoresScreen> {
               ),
             ),
             Expanded(
-              child: ListView.builder(
-                itemCount: services.length,
-                itemBuilder: (ctx, i) {
-                  return ListTile(
-                    onTap: () async {
-                      if (i == 0) {
-                        _showDialog(i);
-                      } else if (i == 1) {
-                        Navigator.of(context).pop();
-                        freindsFunction();
-                      } else if (i == 2) {
-                        TextStyle style = TextStyle(fontSize: 18);
-                        showModalBottomSheet(
-                            backgroundColor: Colors.white,
-                            context: context,
-                            builder: (context) => SingleChildScrollView(
-                                  child: Container(
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(32.0),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.end,
-                                        children: [
-                                          Center(
-                                            child: Text(
-                                              'تطبيق محفظتي',
-                                              textDirection: TextDirection.rtl,
-                                              style: style,
-                                            ),
+              child: Container(
+                color: Theme.of(context).primaryColor,
+                child: Container(
+                  decoration: new BoxDecoration(
+                      color: Colors.grey[300],
+                      borderRadius: new BorderRadius.only(
+                        topRight: const Radius.circular(40.0),
+                        topLeft: const Radius.circular(40.0),
+                      )),
+                  child: ListView.builder(
+                    itemCount: services.length,
+                    itemBuilder: (ctx, i) {
+                      return ListTile(
+                        onTap: () async {
+                          if (i == 0) {
+                            _showDialog(i);
+                          } else if (i == 1) {
+                            Navigator.of(context).pop();
+                            freindsFunction();
+                          } else if (i == 2) {
+                            TextStyle style = TextStyle(fontSize: 18);
+                            showModalBottomSheet(
+                                backgroundColor: Colors.white,
+                                context: context,
+                                builder: (context) => SingleChildScrollView(
+                                      child: Container(
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(32.0),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.end,
+                                            children: [
+                                              Center(
+                                                child: Text(
+                                                  'تطبيق محفظتي',
+                                                  textDirection:
+                                                      TextDirection.rtl,
+                                                  style: style,
+                                                ),
+                                              ),
+                                              Text(
+                                                'يحفظ لك جميع فواتيرك ومشترياتك عن طريق تصوير الفاتورة وادخال اسم المتجر والسعر الاجمالي للفاتورة',
+                                                textDirection:
+                                                    TextDirection.rtl,
+                                                style: style,
+                                              ),
+                                              Text(
+                                                'يسمح لك التطبيق بمشاركة فواتيرك و مشترياتك مع الاصدقاء والأهل',
+                                                textDirection:
+                                                    TextDirection.rtl,
+                                                style: style,
+                                              ),
+                                              Center(
+                                                child: Text(
+                                                  'القائمة الجانبية',
+                                                  textDirection:
+                                                      TextDirection.rtl,
+                                                  style: style,
+                                                ),
+                                              ),
+                                              Text(
+                                                'عرض رقمك الخاص الذي يسمح لأصدقائك بالاطلاع على فواتيرك',
+                                                textDirection:
+                                                    TextDirection.rtl,
+                                                style: style,
+                                              ),
+                                              Text(
+                                                'إظافة صديق عن طريق رقمه الظاهر في تطبيقه الخاص لإظافته في قائمتك والإطلاع على فواتيره بشكل مستمر',
+                                                textDirection:
+                                                    TextDirection.rtl,
+                                                style: style,
+                                              ),
+                                            ],
                                           ),
-                                          Text(
-                                            'يحفظ لك جميع فواتيرك ومشترياتك عن طريق تصوير الفاتورة وادخال اسم المتجر والسعر الاجمالي للفاتورة',
-                                            textDirection: TextDirection.rtl,
-                                            style: style,
-                                          ),
-                                          Text(
-                                            'يسمح لك التطبيق بمشاركة فواتيرك و مشترياتك مع الاصدقاء والأهل',
-                                            textDirection: TextDirection.rtl,
-                                            style: style,
-                                          ),
-                                          Center(
-                                            child: Text(
-                                              'القائمة الجانبية',
-                                              textDirection: TextDirection.rtl,
-                                              style: style,
-                                            ),
-                                          ),
-                                          Text(
-                                            'عرض رقمك الخاص الذي يسمح لأصدقائك بالاطلاع على فواتيرك',
-                                            textDirection: TextDirection.rtl,
-                                            style: style,
-                                          ),
-                                          Text(
-                                            'إظافة صديق عن طريق رقمه الظاهر في تطبيقه الخاص لإظافته في قائمتك والإطلاع على فواتيره بشكل مستمر',
-                                            textDirection: TextDirection.rtl,
-                                            style: style,
-                                          ),
-                                        ],
+                                        ),
                                       ),
-                                    ),
-                                  ),
-                                ));
-                      }
+                                    ));
+                          }
+                        },
+                        title: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                services[i],
+                                textDirection: TextDirection.rtl,
+                                style: TextStyle(fontSize: 22),
+                              ),
+                            ),
+                            Icon(
+                              i == 0
+                                  ? Icons.add
+                                  : i == 1
+                                      ? Icons.people
+                                      : Icons.tablet_android,
+                            ),
+                          ],
+                        ),
+                      );
                     },
-                    title: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            services[i],
-                            textDirection: TextDirection.rtl,
-                            style: TextStyle(fontSize: 22),
-                          ),
-                        ),
-                        Icon(
-                          i == 0
-                              ? Icons.add
-                              : i == 1 ? Icons.people : Icons.tablet_android,
-                        ),
-                      ],
-                    ),
-                  );
-                },
+                  ),
+                ),
               ),
             ),
           ],
@@ -537,108 +560,137 @@ class _StoresScreenState extends State<StoresScreen> {
           ),
         ],
       ),
-      body: Container(
-        color: Colors.white,
-        child: Column(
-          children: [
-            widget.dataMap.isEmpty
-                ? Padding(
-                    padding: const EdgeInsets.only(top: 32.0),
-                    child: InkWell(
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => AddNewReceipt()));
-                      },
-                      child: Center(
-                        child: Container(
-                          height: MediaQuery.of(context).size.height / 4,
-                          width: MediaQuery.of(context).size.width / 2,
-                          child: LiquidCircularProgressIndicator(
-                            value: 0.25, // Defaults to 0.5.
-                            valueColor: AlwaysStoppedAnimation(Colors.red),
-                            backgroundColor: Colors.white,
-                            borderColor: Colors.red,
-                            borderWidth: 5.0,
-                            direction: Axis.horizontal,
-                            center: Text(
-                              "إظافة فاتورة جديدة",
-                              textDirection: TextDirection.rtl,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  )
-                : Expanded(
-                    child: GridView.builder(
-                      itemCount: allItems.length,
-                      gridDelegate:
-                          new SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 3),
-                      itemBuilder: (context, i) {
-                        return Container(
-                          decoration: new BoxDecoration(
-                            borderRadius:
-                                new BorderRadius.all(Radius.circular(15)),
-                            image: DecorationImage(
-                                colorFilter: ColorFilter.mode(
-                                    colorList[i], BlendMode.srcATop),
-                                image: AssetImage(
-                                  'assets/images/wallet.png',
-                                ),
-                                fit: BoxFit.fitHeight),
-                          ),
-                          margin: EdgeInsets.all(10),
+      body: Column(
+        children: [
+          Container(
+            height: MediaQuery.of(context).size.height * 0.1,
+            width: double.infinity,
+            color: Theme.of(context).primaryColor,
+            child: Text(
+              "محفظتي",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 45,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'sha',
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          Expanded(
+            child: Container(
+              decoration: new BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: new BorderRadius.only(
+                    topRight: const Radius.circular(40.0),
+                    topLeft: const Radius.circular(40.0),
+                  )),
+              child: Column(
+                children: [
+                  widget.dataMap.isEmpty
+                      ? Padding(
+                          padding: const EdgeInsets.only(top: 32.0),
                           child: InkWell(
                             onTap: () {
                               Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => ReceiptScreen(
-                                    storeName: allItems[i].storeName,
-                                    color: colorList[i],
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => AddNewReceipt()));
+                            },
+                            child: Center(
+                              child: Container(
+                                height: MediaQuery.of(context).size.height / 4,
+                                width: MediaQuery.of(context).size.width / 2,
+                                child: LiquidCircularProgressIndicator(
+                                  value: 0.25, // Defaults to 0.5.
+                                  valueColor:
+                                      AlwaysStoppedAnimation(Colors.red),
+                                  backgroundColor: Colors.white,
+                                  borderColor: Colors.red,
+                                  borderWidth: 5.0,
+                                  direction: Axis.horizontal,
+                                  center: Text(
+                                    "إظافة فاتورة جديدة",
+                                    textDirection: TextDirection.rtl,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        )
+                      : Expanded(
+                          child: GridView.builder(
+                            itemCount: allItems.length,
+                            gridDelegate:
+                                new SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 3),
+                            itemBuilder: (context, i) {
+                              return Container(
+                                decoration: new BoxDecoration(
+                                  borderRadius:
+                                      new BorderRadius.all(Radius.circular(15)),
+                                  image: DecorationImage(
+                                      colorFilter: ColorFilter.mode(
+                                          colorList[i], BlendMode.srcATop),
+                                      image: AssetImage(
+                                        'assets/images/wallet.png',
+                                      ),
+                                      fit: BoxFit.fitHeight),
+                                ),
+                                margin: EdgeInsets.all(10),
+                                child: InkWell(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => ReceiptScreen(
+                                          storeName: allItems[i].storeName,
+                                          color: colorList[i],
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  child: Column(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceAround,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      SizedBox(),
+                                      FittedBox(
+                                        fit: BoxFit.contain,
+                                        child: Text(
+                                          allItems[i].storeName,
+                                          textDirection: TextDirection.rtl,
+                                          textAlign: TextAlign.center,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .headline2
+                                              .copyWith(
+                                                color: colorList[i],
+                                              ),
+                                        ),
+                                      ),
+                                      Text(
+                                        "(${allItems[i].count})",
+                                        textDirection: TextDirection.rtl,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .headline3
+                                            .copyWith(color: colorList[i]),
+                                      )
+                                    ],
                                   ),
                                 ),
                               );
                             },
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                SizedBox(),
-                                FittedBox(
-                                  fit: BoxFit.contain,
-                                  child: Text(
-                                    allItems[i].storeName,
-                                    textDirection: TextDirection.rtl,
-                                    textAlign: TextAlign.center,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .headline2
-                                        .copyWith(
-                                          color: colorList[i],
-                                        ),
-                                  ),
-                                ),
-                                Text(
-                                  "(${allItems[i].count})",
-                                  textDirection: TextDirection.rtl,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .headline3
-                                      .copyWith(color: colorList[i]),
-                                )
-                              ],
-                            ),
                           ),
-                        );
-                      },
-                    ),
-                  ),
-          ],
-        ),
+                        ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
