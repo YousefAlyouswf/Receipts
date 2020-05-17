@@ -175,7 +175,7 @@ class _StoresScreenState extends State<StoresScreen> {
             ),
             new FlatButton(
                 child: new Text("عرض"),
-                onPressed: () {
+                onPressed: () async {
                   if (codeText.text == '' || friendName.text == '') {
                     Fluttertoast.showToast(
                       msg: "يجب تعبئة الحقول",
@@ -187,6 +187,7 @@ class _StoresScreenState extends State<StoresScreen> {
                       fontSize: 16.0,
                     );
                   } else {
+                    await fetchintoMap(codeText.text, context);
                     Navigator.push(
                       context,
                       MaterialPageRoute(

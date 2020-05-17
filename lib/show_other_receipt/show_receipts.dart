@@ -169,7 +169,7 @@ class _ShowReceiptsState extends State<ShowReceipts> {
           ),
           centerTitle: true,
         ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
+        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
         floatingActionButton: FloatingActionButton(
           heroTag: "btn1",
           onPressed: () {
@@ -197,7 +197,7 @@ class _ShowReceiptsState extends State<ShowReceipts> {
                 child: SizedBox(
                   width: MediaQuery.of(context).size.width / 2,
                   child: LinearProgressIndicator(
-                    minHeight: 15,
+                   
                   ),
                 ),
               )
