@@ -186,6 +186,7 @@ class _ShowReceiptsState extends State<ShowReceipts> {
                   dataMap: widget.dataMap,
                   colorList: colorList,
                   showLegends: true,
+                  chartValueStyle: TextStyle(color: Colors.white),
                 ),
               ),
             );
@@ -196,9 +197,7 @@ class _ShowReceiptsState extends State<ShowReceipts> {
             ? Center(
                 child: SizedBox(
                   width: MediaQuery.of(context).size.width / 2,
-                  child: LinearProgressIndicator(
-                   
-                  ),
+                  child: LinearProgressIndicator(),
                 ),
               )
             : GridView.builder(

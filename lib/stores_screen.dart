@@ -195,6 +195,7 @@ class _StoresScreenState extends State<StoresScreen> {
                           textCode: codeText.text,
                           name: friendName.text,
                           saved: false,
+                          dataMap: dataMap,
                         ),
                       ),
                     );
@@ -238,22 +239,22 @@ class _StoresScreenState extends State<StoresScreen> {
                 return Padding(
                   padding: const EdgeInsets.only(left: 50.0, right: 50.0),
                   child: isPressed
-                        ? Container(
+                      ? Container(
                           child: Center(
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.spaceAround,
                               children: [
                                 SizedBox(
-                                    child: CircularProgressIndicator(),
-                                    height: 100.0,
-                                    width: 100.0,
-                                  ),
-                                  Text("جاري جلب البيانات")
+                                  child: CircularProgressIndicator(),
+                                  height: 100.0,
+                                  width: 100.0,
+                                ),
+                                Text("جاري جلب البيانات")
                               ],
                             ),
                           ),
                         )
-                        :  ListView.builder(
+                      : ListView.builder(
                           itemCount: frindes.length,
                           itemBuilder: (ctx, index) {
                             return Padding(
@@ -270,45 +271,25 @@ class _StoresScreenState extends State<StoresScreen> {
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                  subtitle: Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      IconButton(
-                                        onPressed: () {
-                                          Clipboard.setData(new ClipboardData(
-                                              text: frindes[index].code));
-
-                                          Fluttertoast.showToast(
-                                              msg: "تم النسخ",
-                                              toastLength: Toast.LENGTH_SHORT,
-                                              gravity: ToastGravity.BOTTOM,
-                                              timeInSecForIosWeb: 1,
-                                              backgroundColor: Colors.grey,
-                                              textColor: Colors.white,
-                                              fontSize: 16.0);
-                                        },
-                                        icon: Icon(
-                                          Icons.content_copy,
-                                          color: Colors.white,
-                                          size: 15,
-                                        ),
-                                      ),
-                                      Text(
-                                        frindes[index].code,
-                                        textDirection: TextDirection.rtl,
-                                        style: TextStyle(
-                                            color: Colors.grey, fontSize: 12),
-                                      ),
-                                    ],
-                                  ),
                                   leading: IconButton(
                                     icon: Icon(Icons.delete),
                                     color: Colors.red,
                                     onPressed: () async {
+                                      Fluttertoast.showToast(
+                                        msg:
+                                            "تم حذف ${frindes[index].name} بنجاح",
+                                        toastLength: Toast.LENGTH_SHORT,
+                                        gravity: ToastGravity.BOTTOM,
+                                        timeInSecForIosWeb: 1,
+                                        backgroundColor: Colors.grey,
+                                        textColor: Colors.white,
+                                        fontSize: 16.0,
+                                      );
                                       DBHelper.deleteFriend(
                                         'friend',
                                         frindes[index].id,
                                       );
+                                      Navigator.pop(context);
                                     },
                                   ),
                                   onTap: () async {
@@ -329,6 +310,19 @@ class _StoresScreenState extends State<StoresScreen> {
                                         ),
                                       ),
                                     );
+                                  },
+                                  onLongPress: () {
+                                    Clipboard.setData(new ClipboardData(
+                                        text: frindes[index].code));
+
+                                    Fluttertoast.showToast(
+                                        msg: "تم النسخ",
+                                        toastLength: Toast.LENGTH_SHORT,
+                                        gravity: ToastGravity.BOTTOM,
+                                        timeInSecForIosWeb: 1,
+                                        backgroundColor: Colors.grey,
+                                        textColor: Colors.white,
+                                        fontSize: 16.0);
                                   },
                                 ),
                               ),
@@ -579,71 +573,69 @@ class _StoresScreenState extends State<StoresScreen> {
                   )
                 : Expanded(
                     child: GridView.builder(
-                            itemCount: allItems.length,
-                            gridDelegate:
-                                new SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 3),
-                            itemBuilder: (context, i) {
-                              return Container(
-                                decoration: new BoxDecoration(
-                                  borderRadius:
-                                      new BorderRadius.all(Radius.circular(15)),
-                                  image: DecorationImage(
-                                      colorFilter: ColorFilter.mode(
-                                          colorList[i], BlendMode.srcATop),
-                                      image: AssetImage(
-                                        'assets/images/wallet.png',
-                                      ),
-                                      fit: BoxFit.fitHeight),
+                      itemCount: allItems.length,
+                      gridDelegate:
+                          new SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 3),
+                      itemBuilder: (context, i) {
+                        return Container(
+                          decoration: new BoxDecoration(
+                            borderRadius:
+                                new BorderRadius.all(Radius.circular(15)),
+                            image: DecorationImage(
+                                colorFilter: ColorFilter.mode(
+                                    colorList[i], BlendMode.srcATop),
+                                image: AssetImage(
+                                  'assets/images/wallet.png',
                                 ),
-                                margin: EdgeInsets.all(10),
-                                child: InkWell(
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => ReceiptScreen(
-                                          storeName: allItems[i].storeName,
-                                          color: colorList[i],
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                  child: Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceAround,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      SizedBox(),
-                                      FittedBox(
-                                        fit: BoxFit.contain,
-                                        child: Text(
-                                          allItems[i].storeName,
-                                          textDirection: TextDirection.rtl,
-                                          textAlign: TextAlign.center,
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .headline2
-                                              .copyWith(
-                                                color: colorList[i],
-                                              ),
-                                        ),
-                                      ),
-                                      Text(
-                                        "(${allItems[i].count})",
-                                        textDirection: TextDirection.rtl,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .headline3
-                                            .copyWith(color: colorList[i]),
-                                      )
-                                    ],
+                                fit: BoxFit.fitHeight),
+                          ),
+                          margin: EdgeInsets.all(10),
+                          child: InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ReceiptScreen(
+                                    storeName: allItems[i].storeName,
+                                    color: colorList[i],
                                   ),
                                 ),
                               );
                             },
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                SizedBox(),
+                                FittedBox(
+                                  fit: BoxFit.contain,
+                                  child: Text(
+                                    allItems[i].storeName,
+                                    textDirection: TextDirection.rtl,
+                                    textAlign: TextAlign.center,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headline2
+                                        .copyWith(
+                                          color: colorList[i],
+                                        ),
+                                  ),
+                                ),
+                                Text(
+                                  "(${allItems[i].count})",
+                                  textDirection: TextDirection.rtl,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .headline3
+                                      .copyWith(color: colorList[i]),
+                                )
+                              ],
+                            ),
                           ),
+                        );
+                      },
+                    ),
                   ),
           ],
         ),

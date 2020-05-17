@@ -189,7 +189,7 @@ class _AddNewReceiptState extends State<AddNewReceipt> {
                             Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Container(
-                                height: MediaQuery.of(context).size.height / 6,
+                                height: MediaQuery.of(context).size.height / 10,
                                 width: MediaQuery.of(context).size.width / 4,
                                 child: Image.file(
                                   imageStored,
@@ -199,35 +199,50 @@ class _AddNewReceiptState extends State<AddNewReceipt> {
                               ),
                             ),
                             Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
                               children: <Widget>[
                                 Padding(
-                                  padding: const EdgeInsets.all(16.0),
+                                  padding: const EdgeInsets.all(8.0),
                                   child: Container(
                                     width:
-                                        MediaQuery.of(context).size.width / 3,
+                                        MediaQuery.of(context).size.width / 2.5,
                                     child: TextField(
                                       controller: controllerPrice,
-                                      keyboardType: TextInputType.number,
-                                      textDirection: TextDirection.rtl,
+                                      keyboardType:
+                                          TextInputType.numberWithOptions(
+                                              decimal: true),
+                                      style: TextStyle(fontSize: 20),
                                       decoration: InputDecoration(
                                         labelText: 'ر.س',
+                                        hintText: "10.99",
+                                        suffix: IconButton(
+                                            icon: Icon(Icons.clear),
+                                            onPressed: () {
+                                              controllerPrice.clear();
+                                            }),
                                         border: OutlineInputBorder(),
                                       ),
                                     ),
                                   ),
                                 ),
                                 Padding(
-                                  padding: const EdgeInsets.all(16.0),
+                                  padding: const EdgeInsets.all(8.0),
                                   child: Container(
                                     width:
-                                        MediaQuery.of(context).size.width / 3,
+                                        MediaQuery.of(context).size.width / 2.5,
                                     child: SimpleAutoCompleteTextField(
                                       key: keyX,
                                       controller: controllerName,
                                       suggestions: stores,
+                                      style: TextStyle(fontSize: 20),
                                       decoration: InputDecoration(
+                                          hintText: "البقالة",
                                           labelText: 'المتجر',
+                                          suffix: IconButton(
+                                              icon: Icon(Icons.clear),
+                                              onPressed: () {
+                                                controllerName.clear();
+                                              }),
                                           border: OutlineInputBorder()),
                                     ),
                                   ),
@@ -246,6 +261,7 @@ class _AddNewReceiptState extends State<AddNewReceipt> {
                             //-----------------
                             FlatButton(
                               onPressed: () async {
+                                changeNumberLanguage(controllerPrice.text);
                                 if (controllerName.text.isEmpty) {
                                   Fluttertoast.showToast(
                                       msg: "أسم المتجر",
@@ -488,5 +504,37 @@ class _AddNewReceiptState extends State<AddNewReceipt> {
         }
       });
     }
+  }
+
+  String changeNumberLanguage(String numberText) {
+    String numberInput = numberText;
+    List<String> str = numberInput.split('');
+    String x = '';
+    for (var i = 0; i < str.length; i++) {
+      if (str[i] == '٠') {
+        str[i] = '0';
+      } else if (str[i] == '١') {
+        str[i] = '1';
+      } else if (str[i] == '٢') {
+        str[i] = '2';
+      } else if (str[i] == '٣') {
+        str[i] = '3';
+      } else if (str[i] == '٤') {
+        str[i] = '4';
+      } else if (str[i] == '٥') {
+        str[i] = '5';
+      } else if (str[i] == '٦') {
+        str[i] = '6';
+      } else if (str[i] == '٧') {
+        str[i] = '7';
+      } else if (str[i] == '٨') {
+        str[i] = '8';
+      } else if (str[i] == '٩') {
+        str[i] = '9';
+      }
+      x += str[i];
+    }
+    controllerPrice.text = x;
+    return x;
   }
 }
